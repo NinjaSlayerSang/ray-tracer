@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 mod ops;
 mod utils;
 
@@ -25,6 +23,3 @@ pub fn unit() -> Vec3 {
         z: 1.0,
     }
 }
-
-pub type Point3 = Vec3;
-pub type Color = Vec3;

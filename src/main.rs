@@ -1,10 +1,12 @@
+#![allow(unused)]
+
 use std::io::Write;
 
 mod vec3;
 use vec3::Vec3;
 
 fn test() {
-    // let v0 = vec3::zero();
+    let v0 = vec3::zero();
     let v1 = vec3::unit();
     let v = Vec3 {
         x: 1.0,
