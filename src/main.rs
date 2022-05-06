@@ -1,27 +1,29 @@
-#![allow(unused)]
-
 use std::io::Write;
 
 mod vec3;
 use vec3::Vec3;
 
 fn test() {
-    let v0 = vec3::zero();
-    let v1 = vec3::unit();
-    let v = Vec3 {
+    let v1 = Vec3::from((1.0, 1.0, 1.0));
+    let v2 = Vec3 {
         x: 1.0,
         y: 2.0,
         z: 3.0,
     };
+    let v3 = Vec3::from([-1.5, 0.5, 2.0]);
 
-    println!("{} + {} = {}", v, v1, v + v1);
-    println!("{} - {} = {}", v, v1, v - v1);
-    println!("-{} = {}", v, -v);
-    println!("{} * {} = {}", v, 2.0, v * 2.0);
-    println!("{} * {} = {}", 2.0, v, 2.0 * v);
-    println!("{} * {} * {} = {}", v, 2.0, v1, v * 2.0 * v1);
-    println!("{} / {} = {}", v, 2.0, v / 2.0);
-    println!("len{} = {}", v, v.length());
+    println!("{} + {} = {}", v1, v2, v1 + v2);
+    println!("{} - {} = {}", v1, v2, v1 - v2);
+    println!("-{} = {}", v2, -v2);
+    println!("{} * {} = {}", v2, 2.0, v2 * 2.0);
+    println!("{} * {} = {}", 2.0, v2, 2.0 * v2);
+    println!("{} * {} = {}", v1, v2, v1 * v2);
+    println!("{} / {} = {}", v2, 2.0, v2 / 2.0);
+    println!("len{} = {}", v2, v2.length());
+    println!("{} × {} = {}", v1, v2, Vec3::cross(v1, v2));
+    println!("{} × {} = {}", v2, v1, Vec3::cross(v2, v1));
+    println!("unit{} = {}", v2, v2.unit());
+    println!("[{} {} {}] = {}", v1, v2, v3, Vec3::mixed(v1, v2, v3));
 
     std::process::exit(0);
 }
