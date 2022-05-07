@@ -137,4 +137,12 @@ impl Vec3 {
     pub fn mixed(i: Self, j: Self, k: Self) -> f64 {
         Self::dot(Self::cross(i, j), k)
     }
+
+    pub fn veer(self, dir: Self) -> Self {
+        self.length() * dir.unit()
+    }
+
+    pub fn projection(self, dir: Self) -> Self {
+        self * dir / (dir * dir) * dir
+    }
 }
