@@ -12,7 +12,7 @@ fn vec3_base() {
         y: 2.0,
         z: 3.0,
     };
-    let v3 = Vec3::from([-1.5, 0.0, 0.0]);
+    let v3 = Vec3::from((-1.5, 0.0, 0.0));
 
     println!("{}: {:#?}", v0, v0);
 
