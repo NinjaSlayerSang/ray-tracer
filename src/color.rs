@@ -1,7 +1,8 @@
 #![allow(unused)]
 
-pub type Color = crate::vec3::Vec3;
-type F64Tuple3 = (f64, f64, f64);
+use crate::vec3::{F64Tuple3, Vec3};
+
+pub type Color = Vec3;
 
 const SCALE: f64 = 255f64;
 

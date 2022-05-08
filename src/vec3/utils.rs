@@ -1,12 +1,20 @@
 use super::Vec3;
 
-impl From<(f64, f64, f64)> for Vec3 {
-    fn from(tuple: (f64, f64, f64)) -> Self {
+pub type F64Tuple3 = (f64, f64, f64);
+
+impl From<F64Tuple3> for Vec3 {
+    fn from(tuple: F64Tuple3) -> Self {
         Self {
             x: tuple.0,
             y: tuple.1,
             z: tuple.2,
         }
+    }
+}
+
+impl Into<F64Tuple3> for Vec3 {
+    fn into(self) -> F64Tuple3 {
+        (self.x, self.y, self.z)
     }
 }
 

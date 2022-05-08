@@ -1,12 +1,11 @@
 #![allow(unused)]
 
-use ray_tracer::vec3;
-use vec3::Vec3;
+use ray_tracer::{vec3, vec3::Vec3};
 
 #[test]
 fn vec3_base() {
     let v0 = vec3::zero();
-    let v1 = Vec3::from((1.0, 1.0, 1.0));
+    let v1 = Vec3::new(1.0, 1.0, 1.0);
     let v2 = Vec3 {
         x: 1.0,
         y: 2.0,
