@@ -1,18 +1,14 @@
 #![allow(unused)]
 
+mod hit_record;
 mod sphere;
 
-use crate::point3::Point3;
-use crate::ray::Ray;
-use crate::vec3::Vec3;
+use std::ops::RangeInclusive;
 
-#[derive(Clone, Debug, Default)]
-pub struct HitRecord {
-    pub p: Point3,
-    pub n: Vec3,
-    pub t: f64,
-}
+use crate::ray::Ray;
+pub use hit_record::HitRecord;
+pub use sphere::Sphere;
 
 pub trait Hittable {
-    fn hit(ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+    fn hit(&self, ray: &Ray, t_interval: RangeInclusive<f64>, rec: &mut HitRecord) -> bool;
 }

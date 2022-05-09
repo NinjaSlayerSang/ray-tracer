@@ -1,12 +1,20 @@
 #![allow(unused)]
 
+use std::fmt::{Display, Formatter, Result};
+
 use crate::point3::Point3;
 use crate::vec3::Vec3;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Ray {
     pub origin: Point3,
     pub direction: Vec3,
+}
+
+impl Display for Ray {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{} + t{}", self.origin, self.direction)
+    }
 }
 
 impl Ray {
@@ -16,11 +24,5 @@ impl Ray {
 
     pub fn at(&self, t: f64) -> Point3 {
         self.origin + t * self.direction
-    }
-}
-
-impl std::fmt::Display for Ray {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} + t{}", self.origin, self.direction)
     }
 }

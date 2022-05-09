@@ -1,7 +1,9 @@
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+
 use super::Vec3;
 
 // v1 + v2 = v3
-impl std::ops::Add for Vec3 {
+impl Add for Vec3 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -14,7 +16,7 @@ impl std::ops::Add for Vec3 {
 }
 
 // -v1 = v2
-impl std::ops::Neg for Vec3 {
+impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -27,7 +29,7 @@ impl std::ops::Neg for Vec3 {
 }
 
 // v1 - v2 = v3
-impl std::ops::Sub for Vec3 {
+impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -36,7 +38,7 @@ impl std::ops::Sub for Vec3 {
 }
 
 // v1 * v2 = f
-impl std::ops::Mul for Vec3 {
+impl Mul for Vec3 {
     type Output = f64;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -45,7 +47,7 @@ impl std::ops::Mul for Vec3 {
 }
 
 // v1 * f = v2
-impl std::ops::Mul<f64> for Vec3 {
+impl Mul<f64> for Vec3 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
@@ -58,7 +60,7 @@ impl std::ops::Mul<f64> for Vec3 {
 }
 
 // f * v1 = v2
-impl std::ops::Mul<Vec3> for f64 {
+impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, rhs: Vec3) -> Self::Output {
@@ -66,8 +68,25 @@ impl std::ops::Mul<Vec3> for f64 {
     }
 }
 
+// v1 / v2 = f or NaN
+impl Div for Vec3 {
+    type Output = f64;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let p = self * rhs;
+        let ls = self.length();
+        let lr = rhs.length();
+
+        if (p / (ls * lr) == 1f64) {
+            return ls / lr;
+        } else {
+            return f64::NAN;
+        }
+    }
+}
+
 // v1 / f = v2
-impl std::ops::Div<f64> for Vec3 {
+impl Div<f64> for Vec3 {
     type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
@@ -78,7 +97,7 @@ impl std::ops::Div<f64> for Vec3 {
 // assign
 
 // v1 += v2
-impl std::ops::AddAssign for Vec3 {
+impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
@@ -87,8 +106,8 @@ impl std::ops::AddAssign for Vec3 {
 }
 
 // v1 -= v2
-impl std::ops::ShlAssign for Vec3 {
-    fn shl_assign(&mut self, rhs: Self) {
+impl SubAssign for Vec3 {
+    fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
         self.y -= rhs.y;
         self.z -= rhs.z;
@@ -96,7 +115,7 @@ impl std::ops::ShlAssign for Vec3 {
 }
 
 // v *= f
-impl std::ops::MulAssign<f64> for Vec3 {
+impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
         self.x *= rhs;
         self.y *= rhs;
@@ -105,7 +124,7 @@ impl std::ops::MulAssign<f64> for Vec3 {
 }
 
 // v /= f
-impl std::ops::DivAssign<f64> for Vec3 {
+impl DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
         self.x /= rhs;
         self.y /= rhs;
@@ -136,6 +155,18 @@ impl Vec3 {
 
     pub fn mixed(i: Self, j: Self, k: Self) -> f64 {
         Self::dot(Self::cross(i, j), k)
+    }
+
+    pub fn cos_included_angle(u: Self, v: Self) -> f64 {
+        u * v / (u.length() * v.length())
+    }
+
+    pub fn parallel(u: Self, v: Self) -> bool {
+        Self::cos_included_angle(u, v) == 1f64
+    }
+
+    pub fn vertical(u: Self, v: Self) -> bool {
+        u * v == 0f64
     }
 
     pub fn veer(self, dir: Self) -> Self {

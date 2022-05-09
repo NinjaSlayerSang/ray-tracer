@@ -1,10 +1,10 @@
 #![allow(unused)]
 
-use ray_tracer::{vec3, vec3::Vec3};
+use ray_tracer::vec3::Vec3;
 
 #[test]
 fn vec3_base() {
-    let v0 = vec3::zero();
+    let v0 = Vec3::default();
     let v1 = Vec3::new(1.0, 1.0, 1.0);
     let v2 = Vec3 {
         x: 1.0,
@@ -13,7 +13,7 @@ fn vec3_base() {
     };
     let v3 = Vec3::from((-1.5, 0.0, 0.0));
 
-    println!("{}: {:#?}", v0, v0);
+    println!("{}\n{:?}\n{:#?}", v0, v0, v0);
 
     println!("{} + {} = {}", v1, v2, v1 + v2);
 
