@@ -1,14 +1,16 @@
 #![allow(unused)]
 
+mod sphere;
+
 use crate::point3::Point3;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default)]
 pub struct HitRecord {
-    p: Point3,
-    n: Vec3,
-    t: f64,
+    pub p: Point3,
+    pub n: Vec3,
+    pub t: f64,
 }
 
 pub trait Hittable {

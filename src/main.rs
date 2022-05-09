@@ -13,8 +13,8 @@ use utils::{solve_quadratic_equation, QuadraticEquationRealRoot};
 use vec3::Vec3;
 
 fn hit_sphere(center: Point3, radius: f64, ray: &Ray) -> QuadraticEquationRealRoot {
-    let oc = ray.origin() - center;
-    let d = ray.direction();
+    let oc = ray.origin - center;
+    let d = ray.direction;
 
     let a = d * d;
     let hb = d * oc;
@@ -32,7 +32,7 @@ fn ray_color(ray: &Ray) -> Color {
             0.5 * (n + Vec3::from((1.0, 1.0, 1.0)))
         }
         _ => {
-            let unit_direction = ray.direction().unit();
+            let unit_direction = ray.direction.unit();
             let t = 0.5 * (unit_direction.y + 1.0);
             (1.0 - t) * Color::from(WHITE) + t * Color::from((0.5, 0.7, 1.0))
         }

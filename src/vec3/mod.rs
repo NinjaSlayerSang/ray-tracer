@@ -8,7 +8,7 @@ pub use utils::F64Tuple3;
 /*
 Vec3 is regarded as value type, which implements Copy trait.
 Each time when Vec3 called by method or invloved in calculation,
-it will be copy as base value type like "number".
+it will be copied as base value type like "integer" or "float".
 */
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct Vec3 {
