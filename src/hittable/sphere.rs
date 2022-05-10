@@ -34,8 +34,8 @@ impl Hittable for Sphere {
 
         let mut update = |t: f64| -> bool {
             rec.t = t;
-            rec.p = ray.at(rec.t);
-            rec.n = (rec.p - center) / radius;
+            rec.point = ray.at(rec.t);
+            rec.set_face_normal(ray, (rec.point - center) / radius);
             true
         };
 

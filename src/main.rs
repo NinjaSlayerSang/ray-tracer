@@ -9,7 +9,7 @@ use color::{Color, WHITE};
 use hittable::{HitRecord, Hittable, Sphere};
 use point3::Point3;
 use ray::Ray;
-use std::io::Write;
+use std::io::{stderr, Write};
 use vec3::Vec3;
 
 fn ray_color(ray: &Ray) -> Color {
@@ -19,7 +19,7 @@ fn ray_color(ray: &Ray) -> Color {
     let mut hit_record = HitRecord::default();
 
     if sphere.hit(ray, f64::MIN..=f64::MAX, &mut hit_record) {
-        0.5 * (hit_record.n + Vec3::from((1.0, 1.0, 1.0)))
+        0.5 * (hit_record.normal + Vec3::from((1.0, 1.0, 1.0)))
     } else {
         let unit_direction = ray.direction.unit();
         let t = 0.5 * (unit_direction.y + 1.0);
@@ -30,8 +30,8 @@ fn ray_color(ray: &Ray) -> Color {
 fn main() {
     // Image
 
-    let aspect_ratio = 4.0 / 3.0;
-    let image_width = 640;
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
 
     // Camera
@@ -48,11 +48,13 @@ fn main() {
 
     // Render
 
+    let mut std_err = stderr();
+
     println!("P3\n{} {}\n255", image_width, image_height);
 
     for j in (0..image_height).rev() {
         eprint!("\rScanlines remaining: {} ", j);
-        std::io::stderr().flush().unwrap();
+        _ = std_err.flush();
         for i in 0..image_width {
             let u = i as f64 / (image_width - 1) as f64;
             let v = j as f64 / (image_height - 1) as f64;
