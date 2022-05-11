@@ -1,6 +1,7 @@
 #![allow(unused)]
 
-use std::{cmp::Ordering, f64::consts::PI};
+use rand::Rng;
+use std::{cmp::Ordering, f64::consts::PI, ops::Range};
 
 pub enum QuadraticEquationRealRoot {
     Double(f64, f64),
@@ -22,4 +23,8 @@ pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRea
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees / 180f64 * PI
+}
+
+pub fn random_double(range: Range<f64>) -> f64 {
+    rand::thread_rng().gen_range(range)
 }
