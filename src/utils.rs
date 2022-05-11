@@ -1,7 +1,10 @@
 #![allow(unused)]
 
 use rand::Rng;
-use std::{cmp::Ordering, f64::consts::PI, ops::Range};
+use std::{
+    cmp::Ordering,
+    ops::{Range, RangeInclusive},
+};
 
 pub enum QuadraticEquationRealRoot {
     Double(f64, f64),
@@ -19,10 +22,6 @@ pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRea
         Some(Ordering::Equal) => QuadraticEquationRealRoot::Single(-hb / a),
         _ => QuadraticEquationRealRoot::None,
     }
-}
-
-pub fn degrees_to_radians(degrees: f64) -> f64 {
-    degrees / 180f64 * PI
 }
 
 pub fn random_double(range: Range<f64>) -> f64 {

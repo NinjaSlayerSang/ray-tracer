@@ -1,3 +1,4 @@
+mod camera;
 mod color;
 mod hittable;
 mod point3;
