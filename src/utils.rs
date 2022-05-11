@@ -27,3 +27,16 @@ pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRea
 pub fn random_double(range: Range<f64>) -> f64 {
     rand::thread_rng().gen_range(range)
 }
+
+pub trait Clamp
+where
+    Self: Copy + PartialOrd,
+{
+    fn clamp(self, range: RangeInclusive<Self>) -> Self {
+        if range.contains(&self) {
+            self
+        } else {
+            self
+        }
+    }
+}
