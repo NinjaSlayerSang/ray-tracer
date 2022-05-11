@@ -33,10 +33,15 @@ where
     Self: Copy + PartialOrd,
 {
     fn clamp(self, range: RangeInclusive<Self>) -> Self {
-        if range.contains(&self) {
-            self
+        let (&start, &end) = (range.start(), range.end());
+        if self < start {
+            start
+        } else if self > end {
+            end
         } else {
             self
         }
     }
 }
+
+impl Clamp for f64 {}
