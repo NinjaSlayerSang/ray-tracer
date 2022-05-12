@@ -89,13 +89,14 @@ fn main() {
                 pixel_color += ray_color(&ray, &world, max_depth);
             }
 
-            _ = writeln!(
+            writeln!(
                 std_out,
                 "{}\n",
                 (pixel_color / samples_per_pixel as f64)
                     .gamma_correction(2.2)
                     .into_rgb_str()
-            );
+            )
+            .unwrap();
         }
     }
 
