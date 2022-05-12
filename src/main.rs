@@ -6,25 +6,41 @@ mod ray;
 mod utils;
 mod vec3;
 
-use rand::Rng;
+use rand::{thread_rng, Rng};
 use std::io::{stderr, stdout, Write};
 
 use camera::Camera;
-use color::{primary_color::WHITE, Color};
+use color::{
+    primary_color::{BLACK, WHITE},
+    Color,
+};
 use hittable::{HitRecord, Hittable, HittableList, Sphere};
 use point3::Point3;
 use ray::Ray;
-use vec3::Vec3;
+use utils::random_unit_vec3;
 
-fn ray_color(ray: &Ray, world: &HittableList) -> Color {
-    let mut hit_record = HitRecord::default();
+const T_MIN: f64 = 0.001;
+const REFLECTIVITY: f64 = 0.5;
 
-    if world.hit(ray, 0f64..=f64::MAX, &mut hit_record) {
-        0.5 * (hit_record.normal + Vec3::from((1.0, 1.0, 1.0)))
+fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
+    if depth > 0 {
+        let mut rec = HitRecord::default();
+
+        if world.hit(ray, T_MIN, f64::MAX, &mut rec) {
+            let target = rec.point + rec.normal + random_unit_vec3();
+            REFLECTIVITY
+                * ray_color(
+                    &Ray::new(rec.point, Point3::vector(rec.point, target)),
+                    world,
+                    depth - 1,
+                )
+        } else {
+            let unit_direction = ray.direction.unit();
+            let t = 0.5 * (unit_direction.y + 1.0);
+            (1.0 - t) * Color::from(WHITE) + t * Color::from((0.5, 0.7, 1.0))
+        }
     } else {
-        let unit_direction = ray.direction.unit();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        (1.0 - t) * Color::from(WHITE) + t * Color::from((0.5, 0.7, 1.0))
+        Color::from(BLACK)
     }
 }
 
@@ -34,14 +50,15 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 64;
+    let max_depth = 8;
 
     // World
 
     let mut world = HittableList::default();
 
-    world.add(Sphere::new(Point3::from((0.0, 0.0, -1.0)), 0.5));
-    world.add(Sphere::new(Point3::from((0.0, -100.5, -1.0)), 100.0));
+    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
+    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
 
     // Camera
 
@@ -56,10 +73,6 @@ fn main() {
     let mut std_out = stdout();
     let mut std_err = stderr();
 
-    let mut rng = rand::thread_rng();
-    let unit_f64_range = 0f64..=1f64;
-    let mut random = || rng.gen_range(unit_f64_range.clone());
-
     writeln!(std_out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
     for j in (0..image_height).rev() {
@@ -70,16 +83,18 @@ fn main() {
             let mut pixel_color = Color::default();
 
             for _ in 0..=samples_per_pixel {
-                let u = (i as f64 + random()) / (image_width - 1) as f64;
-                let v = (j as f64 + random()) / (image_height - 1) as f64;
+                let u = (i as f64 + thread_rng().gen::<f64>()) / (image_width - 1) as f64;
+                let v = (j as f64 + thread_rng().gen::<f64>()) / (image_height - 1) as f64;
                 let ray = camera.get_ray(u, v);
-                pixel_color += ray_color(&ray, &world);
+                pixel_color += ray_color(&ray, &world, max_depth);
             }
 
             _ = writeln!(
                 std_out,
                 "{}\n",
-                (pixel_color / samples_per_pixel as f64).into_rgb_str()
+                (pixel_color / samples_per_pixel as f64)
+                    .gamma_correction(2.2)
+                    .into_rgb_str()
             );
         }
     }

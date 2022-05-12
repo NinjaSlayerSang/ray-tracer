@@ -1,5 +1,3 @@
-use std::ops::RangeInclusive;
-
 use crate::{
     point3::Point3,
     ray::Ray,
@@ -24,7 +22,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_range: RangeInclusive<f64>, rec: &mut HitRecord) -> bool {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let &Self { center, radius } = self;
         let &Ray { origin, direction } = ray;
         let oc = origin - center;
@@ -44,17 +42,23 @@ impl Hittable for Sphere {
 
         match solve {
             QuadraticEquationRealRoot::Double(t1, t2) => {
-                if t_range.contains(&t1) {
+                if t_min < t1 && t1 < t_max {
                     update(t1)
                 } else {
-                    if t_range.contains(&t2) {
+                    if t_min < t2 && t2 < t_max {
                         update(t2)
                     } else {
                         false
                     }
                 }
             }
-            QuadraticEquationRealRoot::Single(t) => update(t),
+            QuadraticEquationRealRoot::Single(t) => {
+                if t_min < t && t < t_max {
+                    update(t)
+                } else {
+                    false
+                }
+            }
             _ => false,
         }
     }

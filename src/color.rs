@@ -17,6 +17,15 @@ pub type Color = Vec3;
 const SCALE: f64 = 255f64;
 
 impl Color {
+    pub fn gamma_correction(self, gamma: f64) -> Self {
+        let exp = gamma.recip();
+        Self {
+            x: self.x.powf(exp),
+            y: self.y.powf(exp),
+            z: self.z.powf(exp),
+        }
+    }
+
     pub fn into_rgb_str(&self) -> String {
         let (min, max) = (0f64, 1f64);
         format!(

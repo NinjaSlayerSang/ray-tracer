@@ -1,4 +1,7 @@
-use std::{cmp::Ordering, ops::RangeInclusive};
+use rand::{thread_rng, Rng};
+use std::{cmp::Ordering, f64::consts::TAU};
+
+use crate::vec3::Vec3;
 
 pub enum QuadraticEquationRealRoot {
     Double(f64, f64),
@@ -18,18 +21,9 @@ pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRea
     }
 }
 
-pub trait ClampRange
-where
-    Self: Copy + PartialOrd,
-{
-    fn clamp_range(self, range: RangeInclusive<Self>) -> Self {
-        let (&start, &end) = (range.start(), range.end());
-        if self < start {
-            start
-        } else if self > end {
-            end
-        } else {
-            self
-        }
-    }
+pub fn random_unit_vec3() -> Vec3 {
+    let theta = thread_rng().gen_range(0f64..=TAU);
+    let phi = thread_rng().gen_range(0f64..=TAU);
+    let sin_theta = theta.sin();
+    Vec3::new(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
 }
