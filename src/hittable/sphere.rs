@@ -1,9 +1,12 @@
 use std::ops::RangeInclusive;
 
+use crate::{
+    point3::Point3,
+    ray::Ray,
+    utils::{solve_quadratic_equation, QuadraticEquationRealRoot},
+};
+
 use super::{HitRecord, Hittable};
-use crate::point3::Point3;
-use crate::ray::Ray;
-use crate::utils::{solve_quadratic_equation, QuadraticEquationRealRoot};
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Sphere {

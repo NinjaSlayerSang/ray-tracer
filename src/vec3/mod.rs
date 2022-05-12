@@ -1,10 +1,10 @@
-#![allow(unused)]
-
 mod ops;
 mod utils;
 
-use std::cmp::Ordering;
-use std::fmt::{Display, Formatter, Result};
+use std::{
+    cmp::Ordering,
+    fmt::{Display, Formatter, Result},
+};
 
 pub use utils::F64Tuple3;
 

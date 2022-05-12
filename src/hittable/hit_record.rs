@@ -1,8 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 
-use crate::point3::Point3;
-use crate::ray::Ray;
-use crate::vec3::Vec3;
+use crate::{point3::Point3, ray::Ray, vec3::Vec3};
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct HitRecord {

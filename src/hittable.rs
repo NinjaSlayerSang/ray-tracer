@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 mod hit_record;
 mod hittable_list;
 mod sphere;
@@ -7,6 +5,7 @@ mod sphere;
 use std::ops::RangeInclusive;
 
 use crate::ray::Ray;
+
 pub use hit_record::HitRecord;
 pub use hittable_list::HittableList;
 pub use sphere::Sphere;

@@ -6,11 +6,14 @@ mod ray;
 mod utils;
 mod vec3;
 
-use color::{Color, WHITE};
+use rand::Rng;
+use std::io::{stderr, stdout, Write};
+
+use camera::Camera;
+use color::{primary_color::WHITE, Color};
 use hittable::{HitRecord, Hittable, HittableList, Sphere};
 use point3::Point3;
 use ray::Ray;
-use std::io::{stderr, Write};
 use vec3::Vec3;
 
 fn ray_color(ray: &Ray, world: &HittableList) -> Color {
@@ -31,6 +34,7 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
+    let samples_per_pixel = 100;
 
     // World
 
@@ -45,33 +49,44 @@ fn main() {
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
 
-    let origin = Point3::from((0.0, 0.0, 0.0));
-    let horizontal = Vec3::from((viewport_width, 0.0, 0.0));
-    let vertical = Vec3::from((0.0, viewport_height, 0.0));
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::from((0.0, 0.0, focal_length));
+    let camera = Camera::new_regular(viewport_width, viewport_height, focal_length);
 
     // Render
 
+    let mut std_out = stdout();
     let mut std_err = stderr();
 
-    println!("P3\n{} {}\n255", image_width, image_height);
+    let mut rng = rand::thread_rng();
+    let unit_f64_range = 0f64..=1f64;
+    let mut random = || rng.gen_range(unit_f64_range.clone());
+
+    writeln!(std_out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
     for j in (0..image_height).rev() {
-        eprint!("\rScanlines remaining: {} ", j);
-        _ = std_err.flush();
-        for i in 0..image_width {
-            let u = i as f64 / (image_width - 1) as f64;
-            let v = j as f64 / (image_height - 1) as f64;
-            let ray = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical - origin,
-            );
-            let pixel_color = ray_color(&ray, &world);
+        write!(std_err, "\rScanlines remaining: {} ", j).unwrap();
+        std_err.flush().unwrap();
 
-            println!("{}", pixel_color.into_rgb_str());
+        for i in 0..image_width {
+            let mut pixel_color = Color::default();
+
+            for _ in 0..=samples_per_pixel {
+                let u = (i as f64 + random()) / (image_width - 1) as f64;
+                let v = (j as f64 + random()) / (image_height - 1) as f64;
+                let ray = camera.get_ray(u, v);
+                pixel_color += ray_color(&ray, &world);
+            }
+
+            _ = writeln!(
+                std_out,
+                "{}\n",
+                (pixel_color / samples_per_pixel as f64).into_rgb_str()
+            );
         }
     }
 
-    eprintln!("\nDone.");
+    write!(std_err, "\nDone.").unwrap();
+
+    // Clear
+
+    world.clear();
 }

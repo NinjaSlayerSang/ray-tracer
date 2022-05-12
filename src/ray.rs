@@ -1,9 +1,6 @@
-#![allow(unused)]
-
 use std::fmt::{Display, Formatter, Result};
 
-use crate::point3::Point3;
-use crate::vec3::Vec3;
+use crate::{point3::Point3, vec3::Vec3};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Ray {

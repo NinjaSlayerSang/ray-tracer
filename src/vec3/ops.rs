@@ -77,7 +77,7 @@ impl Div for Vec3 {
         let ls = self.length();
         let lr = rhs.length();
 
-        if (p / (ls * lr) == 1f64) {
+        if p / (ls * lr) == 1f64 {
             return ls / lr;
         } else {
             return f64::NAN;

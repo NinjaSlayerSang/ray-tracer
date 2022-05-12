@@ -1,8 +1,9 @@
 use std::ops::RangeInclusive;
 use std::rc::Rc;
 
-use super::{HitRecord, Hittable};
 use crate::ray::Ray;
+
+use super::{HitRecord, Hittable};
 
 #[derive(Default)]
 pub struct HittableList {
