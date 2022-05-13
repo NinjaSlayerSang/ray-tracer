@@ -176,4 +176,8 @@ impl Vec3 {
     pub fn projection(self, dir: Self) -> Self {
         self * dir / (dir * dir) * dir
     }
+
+    pub fn near_zero(self) -> bool {
+        self.x == 0f64 && self.y == 0f64 && self.z == 0f64
+    }
 }

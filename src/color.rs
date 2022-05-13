@@ -1,5 +1,3 @@
-use crate::vec3::Vec3;
-
 pub mod primary_color {
     #![allow(dead_code)]
 
@@ -11,6 +9,8 @@ pub mod primary_color {
     pub const BLUE: F64Tuple3 = (0f64, 0f64, 1f64);
     pub const WHITE: F64Tuple3 = (1f64, 1f64, 1f64);
 }
+
+use crate::vec3::Vec3;
 
 pub type Color = Vec3;
 

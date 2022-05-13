@@ -1,18 +1,34 @@
-use std::fmt::{Display, Formatter, Result};
+use std::{
+    fmt::{Display, Formatter, Result},
+    rc::Rc,
+};
 
-use crate::{point3::Point3, ray::Ray, vec3::Vec3};
+use crate::{material::Material, point3::Point3, ray::Ray, vec3::Vec3};
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub t: f64,
     pub point: Point3,
     pub normal: Vec3,
     pub front_face: bool,
+    pub material: Rc<dyn Material>,
 }
 
 impl Display for HitRecord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "N{} at {} with t = {}", self.normal, self.point, self.t)
+    }
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self {
+            t: Default::default(),
+            point: Default::default(),
+            normal: Default::default(),
+            front_face: Default::default(),
+            material: Rc::new(()),
+        }
     }
 }
 

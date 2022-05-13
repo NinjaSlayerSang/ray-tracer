@@ -1,6 +1,7 @@
 mod camera;
 mod color;
 mod hittable;
+mod material;
 mod point3;
 mod ray;
 mod utils;
@@ -56,8 +57,8 @@ fn main() {
 
     let mut world = HittableList::default();
 
-    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
-    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
+    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, ()));
+    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, ()));
 
     // Camera
 

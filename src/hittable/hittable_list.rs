@@ -4,9 +4,9 @@ use crate::ray::Ray;
 
 use super::{HitRecord, Hittable};
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct HittableList {
-    objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Rc<dyn Hittable>>,
 }
 
 impl HittableList {

@@ -1,4 +1,7 @@
+use std::rc::Rc;
+
 use crate::{
+    material::Material,
     point3::Point3,
     ray::Ray,
     utils::{solve_quadratic_equation, QuadraticEquationRealRoot},
@@ -6,25 +9,29 @@ use crate::{
 
 use super::{HitRecord, Hittable};
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone)]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
+    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Self {
         Self {
             center,
             radius: radius.abs(),
+            material: Rc::new(material),
         }
     }
 }
 
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let &Self { center, radius } = self;
-        let &Ray { origin, direction } = ray;
+        let center = self.center;
+        let radius = self.radius;
+        let origin = ray.origin;
+        let direction = ray.direction;
         let oc = origin - center;
 
         let a = direction * direction;
@@ -37,6 +44,7 @@ impl Hittable for Sphere {
             rec.t = t;
             rec.point = ray.at(rec.t);
             rec.set_face_normal(ray, (rec.point - center) / radius);
+            rec.material = self.material.clone();
             true
         };
 
