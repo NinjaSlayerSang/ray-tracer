@@ -6,6 +6,5 @@ cargo run | Out-File -encoding ASCII asset/image.ppm
 cargo run > asset/image.ppm
 
 # test
-# vec3
-cargo test --test vec3 -- --color always --show-output
+cargo test --test test-crate-name -- --color always --show-output
 ```
