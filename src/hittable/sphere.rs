@@ -17,11 +17,11 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Self {
+    pub fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
         Self {
             center,
             radius: radius.abs(),
-            material: Rc::new(material),
+            material,
         }
     }
 }

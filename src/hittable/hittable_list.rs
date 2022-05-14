@@ -10,11 +10,8 @@ pub struct HittableList {
 }
 
 impl HittableList {
-    pub fn add(&mut self, object: impl Hittable + 'static) -> Rc<impl Hittable> {
-        let ptr = Rc::new(object);
-        let shared = ptr.clone();
-        self.objects.push(ptr);
-        shared
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        self.objects.push(object)
     }
 
     pub fn clear(&mut self) {
