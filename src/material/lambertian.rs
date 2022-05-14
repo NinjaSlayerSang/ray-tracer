@@ -23,7 +23,7 @@ impl Material for Lambertian {
     ) -> bool {
         let mut scatter_direction = rec.normal + random_unit_vec3();
 
-        if scatter_direction.near_zero() {
+        if scatter_direction == Vec3::default() {
             scatter_direction = rec.normal
         }
 

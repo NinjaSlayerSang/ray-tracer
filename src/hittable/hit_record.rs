@@ -3,7 +3,12 @@ use std::{
     rc::Rc,
 };
 
-use crate::{material::Material, point3::Point3, ray::Ray, vec3::Vec3};
+use crate::{
+    material::{Empty, Material},
+    point3::Point3,
+    ray::Ray,
+    vec3::Vec3,
+};
 
 #[derive(Clone)]
 pub struct HitRecord {
@@ -14,21 +19,21 @@ pub struct HitRecord {
     pub material: Rc<dyn Material>,
 }
 
-impl Display for HitRecord {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "N{} at {} with t = {}", self.normal, self.point, self.t)
-    }
-}
-
 impl Default for HitRecord {
     fn default() -> Self {
         Self {
-            t: Default::default(),
-            point: Default::default(),
-            normal: Default::default(),
-            front_face: Default::default(),
-            material: Rc::new(()),
+            t: f64::default(),
+            point: Point3::default(),
+            normal: Vec3::default(),
+            front_face: bool::default(),
+            material: Rc::new(Empty::default()),
         }
+    }
+}
+
+impl Display for HitRecord {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "N{} at {} with t = {}", self.normal, self.point, self.t)
     }
 }
 

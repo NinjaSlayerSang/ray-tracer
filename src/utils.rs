@@ -27,3 +27,7 @@ pub fn random_unit_vec3() -> Vec3 {
     let sin_theta = theta.sin();
     Vec3::new(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
 }
+
+pub fn reflect_unit_vec3(v: Vec3, n: Vec3) -> Vec3 {
+    v - 2f64 * v * n * n
+}

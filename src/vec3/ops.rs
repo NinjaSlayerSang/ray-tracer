@@ -153,6 +153,14 @@ impl Vec3 {
         }
     }
 
+    pub fn matrix_mul(u: Self, v: Self) -> Self {
+        Self {
+            x: u.x * v.x,
+            y: u.y * v.y,
+            z: u.z * v.z,
+        }
+    }
+
     pub fn mixed(i: Self, j: Self, k: Self) -> f64 {
         Self::dot(Self::cross(i, j), k)
     }
@@ -177,7 +185,7 @@ impl Vec3 {
         self * dir / (dir * dir) * dir
     }
 
-    pub fn near_zero(self) -> bool {
-        self.x == 0f64 && self.y == 0f64 && self.z == 0f64
+    pub fn reflect(self, n: Self) -> Self {
+        self - 2f64 * self.projection(n)
     }
 }
