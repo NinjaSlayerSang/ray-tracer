@@ -1,7 +1,8 @@
 use crate::{
     color::Color,
+    hittable::HitRecord,
     ray::Ray,
-    utils::{random_unit_vec3, reflect_unit_vec3},
+    utils::{random_unit_vec3, reflect_unit_normal},
     vec3::Vec3,
 };
 
@@ -25,12 +26,12 @@ impl Metal {
 impl Material for Metal {
     fn scatter(
         &self,
-        ray_in: &crate::ray::Ray,
-        rec: &crate::hittable::HitRecord,
+        ray_in: &Ray,
+        rec: &HitRecord,
         attenuation: &mut Color,
-        scattered: &mut crate::ray::Ray,
+        scattered: &mut Ray,
     ) -> bool {
-        let reflected = reflect_unit_vec3(ray_in.direction, rec.normal);
+        let reflected = reflect_unit_normal(ray_in.direction, rec.normal);
         *attenuation = self.albedo;
         *scattered = Ray::new(rec.point, reflected + self.fuzz * random_unit_vec3());
         Vec3::dot(reflected, rec.normal).is_sign_positive()

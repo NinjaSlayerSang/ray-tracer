@@ -1,9 +1,10 @@
+mod dielectric;
 mod lambertian;
 mod metal;
 
 use crate::{color::Color, hittable::HitRecord, ray::Ray};
 
-pub use {lambertian::Lambertian, metal::Metal};
+pub use {dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Empty;

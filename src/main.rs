@@ -19,7 +19,7 @@ use color::{
     Color,
 };
 use hittable::{HitRecord, Hittable, HittableList, Sphere};
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use point3::Point3;
 use ray::Ray;
 
@@ -72,19 +72,19 @@ fn main() {
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, 0.0, -1.0),
         0.5,
-        Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3))),
+        Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))),
     )));
     // left
     world.add(Rc::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3)),
+        Rc::new(Dielectric::new(1.5)),
     )));
     // right
     world.add(Rc::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)),
+        Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1)),
     )));
 
     // Camera
