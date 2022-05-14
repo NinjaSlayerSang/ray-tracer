@@ -10,11 +10,11 @@ pub struct Camera {
 
 impl Camera {
     pub fn new_regular(viewport_width: f64, viewport_height: f64, focal_length: f64) -> Self {
-        let origin = Point3::default();
-        let horizontal = Vec3::new(viewport_width, 0f64, 0f64);
-        let vertical = Vec3::new(0f64, viewport_height, 0f64);
+        let origin = Point3::new(0, 0, 0);
+        let horizontal = Vec3::new(viewport_width, 0, 0);
+        let vertical = Vec3::new(0, viewport_height, 0);
         let lower_left_corner =
-            origin - horizontal / 2f64 - vertical / 2f64 - Vec3::new(0f64, 0f64, focal_length);
+            origin - horizontal / 2 - vertical / 2 - Vec3::new(0, 0, focal_length);
 
         Self {
             origin,

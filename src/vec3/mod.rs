@@ -11,11 +11,7 @@ Each time when Vec3 called by method or invloved in calculation,
 it will be copied as base value type like "integer" or "float".
 */
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
-pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-}
+pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl PartialOrd for Vec3 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -25,30 +21,26 @@ impl PartialOrd for Vec3 {
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+        write!(f, "({}, {}, {})", self.0, self.1, self.2)
     }
 }
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
+    pub fn new(x: impl Into<f64>, y: impl Into<f64>, z: impl Into<f64>) -> Self {
+        Self(x.into(), y.into(), z.into())
     }
-}
 
-type F64Tuple3 = (f64, f64, f64);
+    // alias
 
-impl From<F64Tuple3> for Vec3 {
-    fn from(tuple: F64Tuple3) -> Self {
-        Self {
-            x: tuple.0,
-            y: tuple.1,
-            z: tuple.2,
-        }
+    pub fn x(&self) -> f64 {
+        self.0
     }
-}
 
-impl Into<F64Tuple3> for Vec3 {
-    fn into(self) -> F64Tuple3 {
-        (self.x, self.y, self.z)
+    pub fn y(&self) -> f64 {
+        self.1
+    }
+
+    pub fn z(&self) -> f64 {
+        self.2
     }
 }

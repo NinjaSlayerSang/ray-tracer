@@ -2,6 +2,7 @@ use crate::{
     color::Color,
     ray::Ray,
     utils::{random_unit_vec3, reflect_unit_vec3},
+    vec3::Vec3,
 };
 
 use super::Material;
@@ -32,6 +33,6 @@ impl Material for Metal {
         let reflected = reflect_unit_vec3(ray_in.direction, rec.normal);
         *attenuation = self.albedo;
         *scattered = Ray::new(rec.point, reflected + self.fuzz * random_unit_vec3());
-        reflected * rec.normal > 0f64
+        Vec3::dot(reflected, rec.normal).is_sign_positive()
     }
 }

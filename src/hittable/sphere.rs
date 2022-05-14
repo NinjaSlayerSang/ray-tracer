@@ -5,6 +5,7 @@ use crate::{
     point3::Point3,
     ray::Ray,
     utils::{solve_quadratic_equation, QuadraticEquationRealRoot},
+    vec3::Vec3,
 };
 
 use super::{HitRecord, Hittable};
@@ -34,9 +35,9 @@ impl Hittable for Sphere {
         let direction = ray.direction;
         let oc = origin - center;
 
-        let a = direction * direction;
-        let hb = direction * oc;
-        let c = oc * oc - radius * radius;
+        let a = Vec3::dot(direction, direction);
+        let hb = Vec3::dot(direction, oc);
+        let c = Vec3::dot(oc, oc) - radius * radius;
 
         let solve = solve_quadratic_equation(a, hb, c);
 

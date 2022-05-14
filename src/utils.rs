@@ -29,5 +29,5 @@ pub fn random_unit_vec3() -> Vec3 {
 }
 
 pub fn reflect_unit_vec3(v: Vec3, n: Vec3) -> Vec3 {
-    v - 2f64 * v * n * n
+    v - 2 * (Vec3::dot(v, n) * n)
 }
