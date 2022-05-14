@@ -1,13 +1,33 @@
 pub mod primary_color {
     #![allow(dead_code)]
 
-    use crate::vec3::F64Tuple3;
+    use super::Color;
 
-    pub const BLACK: F64Tuple3 = (0f64, 0f64, 0f64);
-    pub const RED: F64Tuple3 = (1f64, 0f64, 0f64);
-    pub const GREEN: F64Tuple3 = (0f64, 1f64, 0f64);
-    pub const BLUE: F64Tuple3 = (0f64, 0f64, 1f64);
-    pub const WHITE: F64Tuple3 = (1f64, 1f64, 1f64);
+    pub const BLACK: Color = Color {
+        x: 0f64,
+        y: 0f64,
+        z: 0f64,
+    };
+    pub const WHITE: Color = Color {
+        x: 1f64,
+        y: 1f64,
+        z: 1f64,
+    };
+    pub const RED: Color = Color {
+        x: 1f64,
+        y: 0f64,
+        z: 0f64,
+    };
+    pub const GREEN: Color = Color {
+        x: 0f64,
+        y: 1f64,
+        z: 0f64,
+    };
+    pub const BLUE: Color = Color {
+        x: 0f64,
+        y: 0f64,
+        z: 1f64,
+    };
 }
 
 use crate::vec3::Vec3;

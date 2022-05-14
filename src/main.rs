@@ -38,15 +38,15 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
             {
                 Color::matrix_mul(attenuation, ray_color(&scattered, world, depth - 1))
             } else {
-                Color::from(BLACK)
+                BLACK
             }
         } else {
             let unit_direction = ray.direction.unit();
             let t = 0.5 * (unit_direction.y + 1.0);
-            (1.0 - t) * Color::from(WHITE) + t * Color::from((0.5, 0.7, 1.0))
+            (1.0 - t) * WHITE + t * Color::from((0.5, 0.7, 1.0))
         }
     } else {
-        Color::from(BLACK)
+        BLACK
     }
 }
 

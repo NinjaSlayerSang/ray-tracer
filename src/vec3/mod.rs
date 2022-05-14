@@ -1,12 +1,9 @@
 mod ops;
-mod utils;
 
 use std::{
     cmp::Ordering,
     fmt::{Display, Formatter, Result},
 };
-
-pub use utils::F64Tuple3;
 
 /*
 Vec3 is regarded as value type, which implements Copy trait.
@@ -35,5 +32,23 @@ impl Display for Vec3 {
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
+    }
+}
+
+type F64Tuple3 = (f64, f64, f64);
+
+impl From<F64Tuple3> for Vec3 {
+    fn from(tuple: F64Tuple3) -> Self {
+        Self {
+            x: tuple.0,
+            y: tuple.1,
+            z: tuple.2,
+        }
+    }
+}
+
+impl Into<F64Tuple3> for Vec3 {
+    fn into(self) -> F64Tuple3 {
+        (self.x, self.y, self.z)
     }
 }
