@@ -2,7 +2,7 @@ use crate::{
     color::{primary_color::WHITE, Color},
     hittable::HitRecord,
     ray::Ray,
-    utils::{reflect_unit_normal, refract_unit_normal},
+    utils::refleract,
 };
 
 use super::Material;
@@ -27,21 +27,10 @@ impl Material for Dielectric {
         scattered: &mut Ray,
     ) -> bool {
         *attenuation = WHITE;
-
-        let refraction_ratio = if rec.front_face {
-            self.ir.recip()
-        } else {
-            self.ir
-        };
-
-        if let Some(refracted) = refract_unit_normal(ray_in.direction, rec.normal, refraction_ratio)
-        {
-            *scattered = Ray::new(rec.point, refracted);
-        } else {
-            let reflected = reflect_unit_normal(ray_in.direction, rec.normal);
-            *scattered = Ray::new(rec.point, reflected);
-        }
-
+        *scattered = Ray::new(
+            ray_in.at(rec.t),
+            refleract(ray_in.direction, rec.normal, self.ir, 0f64),
+        );
         true
     }
 }

@@ -38,7 +38,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
             {
                 attenuation * ray_color(&scattered, world, depth - 1)
             } else {
-                BLACK
+                attenuation
             }
         } else {
             let unit_direction = ray.direction.unit();
@@ -55,8 +55,8 @@ fn main() {
 
     let (image_width, image_height) = (640, 360);
     let aspect_ratio = (image_width as f64) / (image_height as f64);
-    let samples_per_pixel = 32;
-    let max_depth = 8;
+    let samples_per_pixel = 64;
+    let max_depth = 64;
 
     // World
 
@@ -75,10 +75,16 @@ fn main() {
         Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))),
     )));
     // left
+    let grass = Rc::new(Dielectric::new(1.5));
     world.add(Rc::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Rc::new(Dielectric::new(1.5)),
+        grass.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.4,
+        grass.clone(),
     )));
     // right
     world.add(Rc::new(Sphere::new(

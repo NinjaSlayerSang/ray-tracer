@@ -43,8 +43,7 @@ impl Hittable for Sphere {
 
         let mut update = |t: f64| -> bool {
             rec.t = t;
-            rec.point = ray.at(rec.t);
-            rec.set_face_normal(ray, (rec.point - center) / radius);
+            rec.normal = (ray.at(rec.t) - center) / radius; // unit vector
             rec.material = self.material.clone();
             true
         };

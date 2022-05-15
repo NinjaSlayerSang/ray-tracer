@@ -1,10 +1,4 @@
-use crate::{
-    color::Color,
-    hittable::HitRecord,
-    ray::Ray,
-    utils::{random_unit_vec3, reflect_unit_normal},
-    vec3::Vec3,
-};
+use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::refleract};
 
 use super::Material;
 
@@ -31,9 +25,11 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = reflect_unit_normal(ray_in.direction, rec.normal);
         *attenuation = self.albedo;
-        *scattered = Ray::new(rec.point, reflected + self.fuzz * random_unit_vec3());
-        Vec3::dot(reflected, rec.normal).is_sign_positive()
+        *scattered = Ray::new(
+            ray_in.at(rec.t),
+            refleract(ray_in.direction, rec.normal, 0f64, self.fuzz),
+        );
+        true
     }
 }

@@ -28,19 +28,34 @@ pub fn random_unit_vec3() -> Vec3 {
     Vec3::new(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
 }
 
-pub fn reflect_unit_normal(v: Vec3, unit_n: Vec3) -> Vec3 {
-    v - 2 * (Vec3::dot(v, unit_n) * unit_n)
+fn refractance(cosine: f64, ref_idx: f64) -> bool {
+    let r0 = ((1f64 - ref_idx) / (1f64 + ref_idx)).powi(2);
+    r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen()
 }
 
-pub fn refract_unit_normal(v: Vec3, unit_n: Vec3, etai_over_etat: f64) -> Option<Vec3> {
-    let unit_v = v.unit();
-    let cos_theta = -Vec3::dot(unit_v, unit_n);
-    let out_perp = etai_over_etat * (unit_v + cos_theta * unit_n);
-    let k = 1f64 - Vec3::dot(out_perp, out_perp);
-    if k.is_sign_positive() {
-        let out_parallel = -k.sqrt() * unit_n;
-        Some(out_perp + out_parallel)
+pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
+    let cos_theta_lv = Vec3::dot(v, un);
+
+    if cos_theta_lv == 0f64 {
+        return v;
+    }
+
+    if eta > 0f64 {
+        let cos_theta_sign = cos_theta_lv > 0f64;
+        let e = if cos_theta_sign { eta } else { eta.recip() };
+        let vertical = e * (v - cos_theta_lv * un);
+        let discriminant = Vec3::dot(v, v) - Vec3::dot(vertical, vertical);
+        if discriminant > 0f64 && refractance((cos_theta_lv / v.length()).abs(), e) {
+            let parallel = discriminant.sqrt() * if cos_theta_sign { un } else { -un };
+            return vertical + parallel;
+        }
+    }
+
+    let reflected = v - 2f64 * cos_theta_lv * un;
+
+    if fuzz > 0f64 {
+        reflected + fuzz * cos_theta_lv * random_unit_vec3()
     } else {
-        None
+        reflected
     }
 }
