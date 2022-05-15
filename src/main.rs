@@ -60,10 +60,10 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
 fn main() {
     // Image
 
-    let (image_width, image_height) = (640, 360);
+    let (image_width, image_height) = (1920, 1080);
     let aspect_ratio = (image_width as f64) / (image_height as f64);
-    let samples_per_pixel = 64;
-    let max_depth = 64;
+    let samples_per_pixel = 32;
+    let max_depth = 128;
 
     // World
 
@@ -88,31 +88,33 @@ fn main() {
         Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))),
     )));
     // left
-    let grass = Rc::new(Dielectric::new(1.5));
+    let glass = Rc::new(Dielectric::new(1.5));
     world.add(Rc::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
+        Point3::new(-1.01, 0.0, -1.0),
         0.5,
-        grass.clone(),
+        glass.clone(),
     )));
     world.add(Rc::new(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         -0.4,
-        grass.clone(),
+        glass.clone(),
     )));
     // right
     world.add(Rc::new(Sphere::new(
-        Point3::new(1.0, 0.0, -1.0),
+        Point3::new(1.01, 0.0, -1.0),
         0.5,
         Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1)),
     )));
 
     // Camera
 
-    let viewport_height = 2.0;
-    let viewport_width = aspect_ratio * viewport_height;
-    let focal_length = 1.0;
-
-    let camera = Camera::new_regular(viewport_width, viewport_height, focal_length);
+    let camera = Camera::new(
+        Point3::new(-2, 1, 3),
+        Point3::new(0, 0, -1),
+        Vec3::new(0, 1, 0),
+        35.0,
+        aspect_ratio,
+    );
 
     // Render
 
