@@ -62,8 +62,14 @@ fn main() {
 
     let (image_width, image_height) = (1920, 1080);
     let aspect_ratio = (image_width as f64) / (image_height as f64);
-    let samples_per_pixel = 32;
     let max_depth = 128;
+    let random_sample = false;
+    let sample_rank = 4;
+    let samples_per_pixel = if random_sample {
+        16
+    } else {
+        sample_rank * sample_rank
+    };
 
     // World
 
@@ -123,6 +129,8 @@ fn main() {
 
     writeln!(std_out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
+    let image_width_denominator = image_width as f64;
+    let image_height_denominator = image_height as f64;
     for j in (0..image_height).rev() {
         write!(std_err, "\rScanlines remaining: {} ", j).unwrap();
         std_err.flush().unwrap();
@@ -130,11 +138,25 @@ fn main() {
         for i in 0..image_width {
             let mut pixel_color = Color::default();
 
-            for _ in 0..=samples_per_pixel {
-                let u = (i as f64 + thread_rng().gen::<f64>()) / (image_width - 1) as f64;
-                let v = (j as f64 + thread_rng().gen::<f64>()) / (image_height - 1) as f64;
-                let ray = camera.get_ray(u, v);
-                pixel_color += ray_color(&ray, &world, max_depth);
+            if random_sample {
+                for _ in 0..samples_per_pixel {
+                    let s = (i as f64 + thread_rng().gen::<f64>()) / image_width_denominator;
+                    let t = (j as f64 + thread_rng().gen::<f64>()) / image_height_denominator;
+                    let ray = camera.get_ray(s, t);
+                    pixel_color += ray_color(&ray, &world, max_depth);
+                }
+            } else {
+                let sample_denominator = (sample_rank + 1) as f64;
+                for u in 1..=sample_rank {
+                    for v in 1..=sample_rank {
+                        let s =
+                            (i as f64 + u as f64 / sample_denominator) / image_width_denominator;
+                        let t =
+                            (j as f64 + v as f64 / sample_denominator) / image_height_denominator;
+                        let ray = camera.get_ray(s, t);
+                        pixel_color += ray_color(&ray, &world, max_depth);
+                    }
+                }
             }
 
             writeln!(
