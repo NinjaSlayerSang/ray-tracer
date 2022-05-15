@@ -4,8 +4,8 @@ use super::Material;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Metal {
-    pub albedo: Color,
-    pub fuzz: f64,
+    albedo: Color,
+    fuzz: f64,
 }
 
 impl Metal {

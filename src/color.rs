@@ -5,7 +5,6 @@ pub mod primary_color {
 
     use super::Color;
 
-    pub const BLACK: Color = Vec3(0f64, 0f64, 0f64);
     pub const WHITE: Color = Vec3(1f64, 1f64, 1f64);
     pub const RED: Color = Vec3(1f64, 0f64, 0f64);
     pub const GREEN: Color = Vec3(0f64, 1f64, 0f64);

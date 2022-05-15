@@ -6,7 +6,7 @@ use super::{HitRecord, Hittable};
 
 #[derive(Clone, Default)]
 pub struct HittableList {
-    pub objects: Vec<Rc<dyn Hittable>>,
+    objects: Vec<Rc<dyn Hittable>>,
 }
 
 impl HittableList {

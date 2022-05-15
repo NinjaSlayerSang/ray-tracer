@@ -1,10 +1,7 @@
-use std::{
-    fmt::{Display, Formatter, Result},
-    rc::Rc,
-};
+use std::rc::Rc;
 
 use crate::{
-    material::{Empty, Material},
+    material::{Context, Empty, Material},
     vec3::Vec3,
 };
 
@@ -13,6 +10,7 @@ pub struct HitRecord {
     pub t: f64,
     pub normal: Vec3,
     pub material: Rc<dyn Material>,
+    pub ctx: Context,
 }
 
 impl Default for HitRecord {
@@ -21,12 +19,7 @@ impl Default for HitRecord {
             t: f64::default(),
             normal: Vec3::default(),
             material: Rc::new(Empty::default()),
+            ctx: Context::default(),
         }
-    }
-}
-
-impl Display for HitRecord {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "N{} at t = {}", self.normal, self.t)
     }
 }

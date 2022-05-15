@@ -4,7 +4,7 @@ use super::Material;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Lambertian {
-    pub albedo: Color,
+    albedo: Color,
 }
 
 impl Lambertian {

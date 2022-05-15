@@ -14,14 +14,23 @@ use std::{
 };
 
 use camera::Camera;
-use color::{
-    primary_color::{BLACK, WHITE},
-    Color,
-};
+use color::Color;
 use hittable::{HitRecord, Hittable, HittableList, Sphere};
-use material::{Dielectric, Lambertian, Metal};
+use material::{Dielectric, Lambertian, LightSource, Metal};
 use point3::Point3;
 use ray::Ray;
+use utils::LinearGradientColor;
+use vec3::Vec3;
+
+const SUN_POS: Vec3 = Vec3(-30.0, 150.0, -30.0);
+const BLUE_GRADIENT: LinearGradientColor =
+    LinearGradientColor(Vec3(0.0, 0.1, 0.2), Vec3(0.5, 0.7, 1.0));
+
+fn scene_color(ray: &Ray) -> Color {
+    let cos_theta = Vec3::cos_included_angle(ray.direction, SUN_POS);
+    let t = 0.5 * (cos_theta + 1.0);
+    BLUE_GRADIENT.linear(t)
+}
 
 const T_MIN: f64 = 0.001;
 
@@ -41,12 +50,10 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
                 attenuation
             }
         } else {
-            let unit_direction = ray.direction.unit();
-            let t = 0.5 * (unit_direction.y() + 1.0);
-            (1.0 - t) * WHITE + t * Color::new(0.5, 0.7, 1.0)
+            scene_color(ray)
         }
     } else {
-        BLACK
+        Color::default()
     }
 }
 
@@ -62,6 +69,12 @@ fn main() {
 
     let mut world = HittableList::default();
 
+    // sun
+    world.add(Rc::new(Sphere::new(
+        SUN_POS,
+        50.0,
+        Rc::new(LightSource::default()),
+    )));
     // ground
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),

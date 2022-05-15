@@ -9,7 +9,7 @@ use super::Material;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Dielectric {
-    pub ir: f64,
+    ir: f64,
 }
 
 impl Dielectric {
