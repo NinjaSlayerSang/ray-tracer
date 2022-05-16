@@ -28,6 +28,12 @@ pub fn random_unit_vec3() -> Vec3 {
     Vec3::new(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
 }
 
+pub fn random_vec3_in_unit_circle() -> Vec3 {
+    let theta = thread_rng().gen_range(0f64..=TAU);
+    let r = thread_rng().gen::<f64>();
+    Vec3::new(r * theta.cos(), r * theta.sin(), 0)
+}
+
 fn refractance(cosine: f64, ref_idx: f64) -> bool {
     let r0 = ((1f64 - ref_idx) / (1f64 + ref_idx)).powi(2);
     r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen::<f64>()
