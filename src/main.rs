@@ -4,6 +4,8 @@ mod hittable;
 mod material;
 mod point3;
 mod ray;
+mod render;
+mod scene;
 mod utils;
 mod vec3;
 
@@ -38,7 +40,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     if depth > 0 {
         let mut rec = HitRecord::default();
 
-        if world.hit(ray, T_MIN, f64::MAX, &mut rec) {
+        if world.hit(ray, (T_MIN, f64::MAX), &mut rec) {
             let mut scattered = Ray::default();
             let mut attenuation = Color::default();
             if rec

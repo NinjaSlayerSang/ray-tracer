@@ -1,10 +1,22 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::random_unit_vec3, vec3::Vec3};
+use crate::{
+    color::{primary_color::WHITE, Color},
+    hittable::HitRecord,
+    ray::Ray,
+    utils::random_unit_vec3,
+    vec3::Vec3,
+};
 
 use super::Material;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy)]
 pub struct Lambertian {
     albedo: Color,
+}
+
+impl Default for Lambertian {
+    fn default() -> Self {
+        Self { albedo: WHITE }
+    }
 }
 
 impl Lambertian {
@@ -22,15 +34,19 @@ impl Material for Lambertian {
         scattered: &mut Ray,
     ) -> bool {
         let outward = Vec3::dot(ray_in.direction, rec.normal) <= 0f64;
-        let mut scatter_direction =
-            if outward { rec.normal } else { -rec.normal } + random_unit_vec3();
+        if outward {
+            let mut scatter_direction = rec.normal + random_unit_vec3();
 
-        if scatter_direction == Vec3::default() {
-            scatter_direction = rec.normal
+            if scatter_direction == Vec3::default() {
+                scatter_direction = rec.normal
+            }
+
+            *attenuation = self.albedo;
+            *scattered = Ray::new(ray_in.at(rec.t), scatter_direction);
+            true
+        } else {
+            *attenuation = Color::default();
+            false
         }
-
-        *attenuation = self.albedo;
-        *scattered = Ray::new(ray_in.at(rec.t), scatter_direction);
-        true
     }
 }

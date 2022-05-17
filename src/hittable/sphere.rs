@@ -28,7 +28,9 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, ray: &Ray, t_range: (f64, f64), rec: &mut HitRecord) -> bool {
+        let (t_min, t_max) = t_range;
+
         let center = self.center;
         let radius = self.radius;
         let origin = ray.origin;

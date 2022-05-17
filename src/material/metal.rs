@@ -1,11 +1,26 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::refleract};
+use crate::{
+    color::{primary_color::WHITE, Color},
+    hittable::HitRecord,
+    ray::Ray,
+    utils::refleract,
+    vec3::Vec3,
+};
 
 use super::Material;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
+}
+
+impl Default for Metal {
+    fn default() -> Self {
+        Self {
+            albedo: WHITE,
+            fuzz: 0f64,
+        }
+    }
 }
 
 impl Metal {
@@ -25,11 +40,17 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        *attenuation = self.albedo;
-        *scattered = Ray::new(
-            ray_in.at(rec.t),
-            refleract(ray_in.direction, rec.normal, 0f64, self.fuzz),
-        );
-        true
+        let outward = Vec3::dot(ray_in.direction, rec.normal) <= 0f64;
+        if outward {
+            *attenuation = self.albedo;
+            *scattered = Ray::new(
+                ray_in.at(rec.t),
+                refleract(ray_in.direction, rec.normal, -1f64, self.fuzz),
+            );
+            true
+        } else {
+            *attenuation = Color::default();
+            false
+        }
     }
 }

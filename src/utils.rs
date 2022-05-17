@@ -1,7 +1,10 @@
 use rand::{thread_rng, Rng};
 use std::{cmp::Ordering, f64::consts::TAU};
 
-use crate::{color::Color, vec3::Vec3};
+use crate::{
+    color::{primary_color::WHITE, Color},
+    vec3::Vec3,
+};
 
 pub enum QuadraticEquationRealRoot {
     Double(f64, f64),
@@ -66,7 +69,14 @@ pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
     }
 }
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct LinearGradientColor(pub Color, pub Color);
+
+impl Default for LinearGradientColor {
+    fn default() -> Self {
+        Self(Color::default(), WHITE)
+    }
+}
 
 impl LinearGradientColor {
     pub fn linear(&self, t: f64) -> Color {

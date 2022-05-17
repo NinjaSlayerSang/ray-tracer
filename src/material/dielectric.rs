@@ -7,14 +7,20 @@ use crate::{
 
 use super::Material;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy)]
 pub struct Dielectric {
     ir: f64,
 }
 
+impl Default for Dielectric {
+    fn default() -> Self {
+        Self { ir: 1f64 }
+    }
+}
+
 impl Dielectric {
     pub fn new(ir: f64) -> Self {
-        Self { ir }
+        Self { ir: ir.abs() }
     }
 }
 
@@ -29,7 +35,7 @@ impl Material for Dielectric {
         *attenuation = WHITE;
         *scattered = Ray::new(
             ray_in.at(rec.t),
-            refleract(ray_in.direction, rec.normal, self.ir, 0f64),
+            refleract(ray_in.direction, rec.normal, self.ir, -1f64),
         );
         true
     }

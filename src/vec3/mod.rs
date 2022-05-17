@@ -1,27 +1,18 @@
 mod ops;
 
-use std::{
-    cmp::Ordering,
-    fmt::{Display, Formatter, Result},
-};
+use std::cmp::Ordering;
 
 /*
 Vec3 is regarded as value type, which implements Copy trait.
 Each time when Vec3 called by method or invloved in calculation,
 it will be copied as base value type like "integer" or "float".
 */
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl PartialOrd for Vec3 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.length().partial_cmp(&other.length())
-    }
-}
-
-impl Display for Vec3 {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "({}, {}, {})", self.0, self.1, self.2)
     }
 }
 

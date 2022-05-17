@@ -6,20 +6,20 @@ use crate::{
 
 use super::Material;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy)]
 pub struct LightSource {
     light: Color,
+}
+
+impl Default for LightSource {
+    fn default() -> Self {
+        Self { light: WHITE }
+    }
 }
 
 impl LightSource {
     pub fn new(light: Color) -> Self {
         Self { light }
-    }
-}
-
-impl Default for LightSource {
-    fn default() -> Self {
-        Self::new(WHITE)
     }
 }
 
