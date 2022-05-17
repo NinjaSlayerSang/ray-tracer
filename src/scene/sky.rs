@@ -8,6 +8,15 @@ pub struct Sky {
     linear_gradient: LinearGradientColor,
 }
 
+impl Default for Sky {
+    fn default() -> Self {
+        Self {
+            pole: Vec3::new(0, 1, 0),
+            linear_gradient: Default::default(),
+        }
+    }
+}
+
 impl Sky {
     pub fn new(pole: Vec3, linear_gradient: LinearGradientColor) -> Self {
         Self {

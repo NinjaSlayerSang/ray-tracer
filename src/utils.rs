@@ -39,7 +39,7 @@ pub fn random_vec3_in_unit_circle() -> Vec3 {
 
 fn refractance(cosine: f64, ref_idx: f64) -> bool {
     let r0 = ((1f64 - ref_idx) / (1f64 + ref_idx)).powi(2);
-    r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen::<f64>()
+    r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen()
 }
 
 pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
@@ -69,7 +69,7 @@ pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub struct LinearGradientColor(pub Color, pub Color);
 
 impl Default for LinearGradientColor {

@@ -11,7 +11,7 @@ pub use {
     metal::Metal,
 };
 
-#[derive(Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Default)]
 pub struct Empty;
 
 pub trait Material {

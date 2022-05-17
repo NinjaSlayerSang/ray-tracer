@@ -5,6 +5,7 @@ mod material;
 mod point3;
 mod ray;
 mod render;
+mod sampler;
 mod scene;
 mod utils;
 mod vec3;
