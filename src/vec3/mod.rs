@@ -16,6 +16,12 @@ impl PartialOrd for Vec3 {
     }
 }
 
+impl From<(f64, f64, f64)> for Vec3 {
+    fn from(f: (f64, f64, f64)) -> Self {
+        Self(f.0, f.1, f.2)
+    }
+}
+
 impl Vec3 {
     pub fn new(x: impl Into<f64>, y: impl Into<f64>, z: impl Into<f64>) -> Self {
         Self(x.into(), y.into(), z.into())

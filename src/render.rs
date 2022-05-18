@@ -10,45 +10,37 @@ use crate::{
 
 pub use ppm_render::PPMRender;
 
-pub trait Render {
-    fn ray_color(
-        &self,
-        ray: &Ray,
-        hittable: &impl Hittable,
-        scene: &impl Scene,
-        t_range: (f64, f64),
-        dissipation: Color,
-        depth: i32,
-    ) -> Color {
-        if depth > 0 {
-            let mut rec = HitRecord::default();
-            if hittable.hit(ray, t_range, &mut rec) {
-                let mut scattered = Ray::default();
-                let mut attenuation = Color::default();
-                if rec
-                    .material
-                    .scatter(ray, &rec, &mut attenuation, &mut scattered)
-                {
-                    attenuation
-                        * self.ray_color(
-                            &scattered,
-                            hittable,
-                            scene,
-                            t_range,
-                            dissipation,
-                            depth - 1,
-                        )
-                } else {
-                    attenuation
-                }
+fn ray_color(
+    ray: &Ray,
+    hittable: &impl Hittable,
+    scene: &impl Scene,
+    t_range: (f64, f64),
+    dissipation: Color,
+    depth: i32,
+) -> Color {
+    if depth > 0 {
+        let mut rec = HitRecord::default();
+        if hittable.hit(ray, t_range, &mut rec) {
+            let mut scattered = Ray::default();
+            let mut attenuation = Color::default();
+            if rec
+                .material
+                .scatter(ray, &rec, &mut attenuation, &mut scattered)
+            {
+                attenuation
+                    * ray_color(&scattered, hittable, scene, t_range, dissipation, depth - 1)
             } else {
-                scene.scene_color(ray)
+                attenuation
             }
         } else {
-            dissipation
+            scene.scene_color(ray)
         }
+    } else {
+        dissipation
     }
+}
 
+pub trait Render {
     fn render(
         &self,
         pixel_coord: (i32, i32),
@@ -74,7 +66,7 @@ pub trait Render {
             let t = (j + v) / height;
             let ray = camera.get_ray(s, t);
 
-            pixel_color += self.ray_color(&ray, hittable, scene, t_range, dissipation, depth);
+            pixel_color += ray_color(&ray, hittable, scene, t_range, dissipation, depth);
             count += 1;
         }
 

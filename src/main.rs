@@ -20,62 +20,102 @@ use color::Color;
 use hittable::{HittableList, Sphere};
 use material::{Dielectric, Lambertian, LightSource, Metal};
 use point3::Point3;
+use rand::{thread_rng, Rng};
 use render::PPMRender;
 use sampler::{GridSampler, RandomSampler};
 use scene::Sky;
 use utils::LinearGradientColor;
 use vec3::Vec3;
 
+fn demo_random_world() -> HittableList {
+    let mut world = HittableList::default();
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0, -1000, 0),
+        1000.0,
+        Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))),
+    )));
+
+    let anchor = Point3::new(4, 0.2, 0);
+    for a in -11..11 {
+        for b in -11..11 {
+            let center = Point3::new(
+                a as f64 + thread_rng().gen_range(0.0..=0.9),
+                0.2,
+                b as f64 + thread_rng().gen_range(0.0..=0.9),
+            );
+            if (center - anchor).length() > 0.9 {
+                let choose_mat = thread_rng().gen::<f64>();
+                if choose_mat < 0.8 {
+                    // diffuse
+                    world.add(Rc::new(Sphere::new(
+                        center,
+                        0.2,
+                        Rc::new(Lambertian::new(Color::random() * Color::random())),
+                    )));
+                } else if choose_mat < 0.95 {
+                    // metal
+                    world.add(Rc::new(Sphere::new(
+                        center,
+                        0.2,
+                        Rc::new(Metal::new(
+                            Color::random_range(0.5..=1.0),
+                            thread_rng().gen_range(0.0..=0.5),
+                        )),
+                    )));
+                } else {
+                    // glass
+                    world.add(Rc::new(Sphere::new(
+                        center,
+                        0.2,
+                        Rc::new(Dielectric::new(1.5)),
+                    )));
+                }
+            }
+        }
+    }
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0, 1, 0),
+        1.0,
+        Rc::new(Dielectric::new(1.5)),
+    )));
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-4, 1, 0),
+        1.0,
+        Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))),
+    )));
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(4, 1, 0),
+        1.0,
+        Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
+    )));
+
+    world
+}
+
 fn main() {
     // Const
-    let image_size = (480, 320);
+
+    let image_size = (1800, 1200);
     let aspect_ratio = (image_size.0 as f64) / (image_size.1 as f64);
     #[allow(unused_variables)]
-    let random_sampler = RandomSampler(32);
+    let random_sampler = RandomSampler(50);
     #[allow(unused_variables)]
-    let grid_sampler = GridSampler(4);
+    let grid_sampler = GridSampler(7);
 
     // World & Scene
 
-    let sun_position = Vec3::new(-30, 150, 30);
+    let mut world = demo_random_world();
 
-    let mut world = HittableList::default();
+    let sun_position = Vec3::new(-300, 1500, 300);
 
-    // sun
     world.add(Rc::new(Sphere::new(
         sun_position,
-        50.0,
+        300.0,
         Rc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
-    )));
-    // ground
-    world.add(Rc::new(Sphere::new(
-        Point3::new(0.0, -100.5, -1.0),
-        100.0,
-        Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))),
-    )));
-    // center
-    world.add(Rc::new(Sphere::new(
-        Point3::new(0.0, 0.0, -1.0),
-        0.5,
-        Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))),
-    )));
-    // left
-    let glass = Rc::new(Dielectric::new(1.5));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(-1.01, 0.0, -1.0),
-        0.5,
-        glass.clone(),
-    )));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
-        -0.4,
-        glass.clone(),
-    )));
-    // right
-    world.add(Rc::new(Sphere::new(
-        Point3::new(1.01, 0.0, -1.0),
-        0.5,
-        Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.1)),
     )));
 
     let scene = Sky::new(
@@ -85,17 +125,20 @@ fn main() {
 
     // Camera
 
-    let look_from = Point3::new(-2, 1, 3);
-    let look_at = Point3::new(0, 0, -1);
-    let focus_dist = Vec3::vector(look_from, look_at).length();
+    let look_from = Point3::new(13, 2, 3);
+    let look_at = Point3::new(0, 0, 0);
+    let vup = Vec3::new(0, 1, 0);
+    let vfov = 20.0;
+    let aperture = 0.1;
+    let focus_dist = 10.0;
 
     let camera = Camera::new(
         look_from,
         look_at,
-        Vec3::new(0, 1, 0),
-        35.0,
+        vup,
+        vfov,
         aspect_ratio,
-        0.3,
+        aperture,
         focus_dist,
     );
 
@@ -110,7 +153,7 @@ fn main() {
         .draw(
             &mut std_out,
             image_size,
-            &random_sampler,
+            &grid_sampler,
             &camera,
             &world,
             &scene,
