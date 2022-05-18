@@ -11,7 +11,9 @@ mod utils;
 mod vec3;
 
 use std::{
-    io::{stderr, stdout, Write},
+    env::args,
+    fs::File,
+    io::{stdout, Write},
     rc::Rc,
 };
 
@@ -46,14 +48,14 @@ fn demo_random_world() -> HittableList {
             );
             if (center - anchor).length() > 0.9 {
                 let choose_mat = thread_rng().gen::<f64>();
-                if choose_mat < 0.8 {
+                if choose_mat < 0.4 {
                     // diffuse
                     world.add(Rc::new(Sphere::new(
                         center,
                         0.2,
                         Rc::new(Lambertian::new(Color::random() * Color::random())),
                     )));
-                } else if choose_mat < 0.95 {
+                } else if choose_mat < 0.85 {
                     // metal
                     world.add(Rc::new(Sphere::new(
                         center,
@@ -99,8 +101,9 @@ fn demo_random_world() -> HittableList {
 fn main() {
     // Const
 
-    let image_size = (1800, 1200);
-    let aspect_ratio = (image_size.0 as f64) / (image_size.1 as f64);
+    let image_size = (1920, 1080); // 1080p
+    let (image_width, image_height) = image_size;
+    let aspect_ratio = (image_width as f64) / (image_height as f64);
     #[allow(unused_variables)]
     let random_sampler = RandomSampler(50);
     #[allow(unused_variables)]
@@ -144,26 +147,27 @@ fn main() {
 
     // Render
 
+    let out_file_path = &args().collect::<Vec<String>>()[1];
+    let mut out_file = File::create(out_file_path).unwrap();
     let mut std_out = stdout();
-    let mut std_err = stderr();
 
     PPMRender::default()
         .set_depth(64)
         .set_gamma(2.2)
         .draw(
-            &mut std_out,
+            &mut out_file,
             image_size,
             &grid_sampler,
             &camera,
             &world,
             &scene,
             &mut |p: f64| {
-                write!(std_err, "\rprogress: {:.1}%", p * 100.0).unwrap();
-                std_err.flush().unwrap();
+                write!(std_out, "\rprogress: {:.1}%", p * 100.0).unwrap();
+                std_out.flush().unwrap();
             },
         )
         .unwrap();
-    writeln!(std_err, "\nDone.").unwrap();
+    writeln!(std_out, "\nDone.").unwrap();
 
     // Clear
 
