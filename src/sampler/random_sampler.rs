@@ -12,7 +12,7 @@ impl Iterator for RandomSamplerIter {
     fn next(&mut self) -> Option<Self::Item> {
         if self.n > 0 {
             self.n -= 1;
-            thread_rng().gen()
+            Some(thread_rng().gen::<(f64, f64)>())
         } else {
             None
         }

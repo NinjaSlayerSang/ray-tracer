@@ -1,3 +1,5 @@
+mod ppm_render;
+
 use crate::{
     camera::Camera,
     color::Color,
@@ -13,6 +15,7 @@ pub trait Render {
         hittable: &impl Hittable,
         scene: &impl Scene,
         t_range: (f64, f64),
+        dissipation: Color,
         depth: i32,
     ) -> Color {
         if depth > 0 {
@@ -24,7 +27,15 @@ pub trait Render {
                     .material
                     .scatter(ray, &rec, &mut attenuation, &mut scattered)
                 {
-                    attenuation * self.ray_color(&scattered, hittable, scene, t_range, depth - 1)
+                    attenuation
+                        * self.ray_color(
+                            &scattered,
+                            hittable,
+                            scene,
+                            t_range,
+                            dissipation,
+                            depth - 1,
+                        )
                 } else {
                     attenuation
                 }
@@ -32,7 +43,7 @@ pub trait Render {
                 scene.scene_color(ray)
             }
         } else {
-            Color::default()
+            dissipation
         }
     }
 
@@ -40,12 +51,14 @@ pub trait Render {
         &self,
         pixel_coord: (i32, i32),
         image_size: (i32, i32),
-        sampler: impl IntoIterator<Item = (f64, f64)>,
+        sampler: &(impl IntoIterator<Item = (f64, f64)> + Copy),
         camera: &Camera,
         hittable: &impl Hittable,
         scene: &impl Scene,
         t_range: (f64, f64),
+        dissipation: Color,
         depth: i32,
+        gamma: f64,
     ) -> Color {
         let (i, j) = pixel_coord;
         let (width, height) = image_size;
@@ -54,15 +67,15 @@ pub trait Render {
         let mut pixel_color = Color::default();
         let mut count = 0;
 
-        for (u, v) in sampler {
+        for (u, v) in *sampler {
             let s = (i + u) / width;
             let t = (j + v) / height;
             let ray = camera.get_ray(s, t);
 
-            pixel_color += self.ray_color(&ray, hittable, scene, t_range, depth);
+            pixel_color += self.ray_color(&ray, hittable, scene, t_range, dissipation, depth);
             count += 1;
         }
 
-        pixel_color / count
+        (pixel_color / count).gamma_correction(gamma)
     }
 }
