@@ -44,11 +44,14 @@ impl PPMRender {
         camera: &Camera,
         hittable: &impl Hittable,
         scene: &impl Scene,
+        progress: &mut impl FnMut(f64),
     ) -> Result<()> {
         let (image_width, image_height) = image_size;
+        let d = image_height as f64;
         writeln!(out, "P3\n{} {}\n255", image_width, image_height)?;
 
         for j in (0..image_height).rev() {
+            progress(j as f64 / d);
             for i in 0..image_width {
                 let color = self.render(
                     (i, j),
