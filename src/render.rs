@@ -8,6 +8,8 @@ use crate::{
     scene::Scene,
 };
 
+pub use ppm_render::PPMRender;
+
 pub trait Render {
     fn ray_color(
         &self,

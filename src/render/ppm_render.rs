@@ -24,6 +24,18 @@ impl Default for PPMRender {
 }
 
 impl PPMRender {
+    #![allow(dead_code)]
+
+    pub fn set_t_range(mut self, t_range: (f64, f64)) -> Self {
+        self.t_range = t_range;
+        self
+    }
+
+    pub fn set_dissipation(mut self, dissipation: Color) -> Self {
+        self.dissipation = dissipation;
+        self
+    }
+
     pub fn set_depth(mut self, depth: i32) -> Self {
         self.depth = depth;
         self
@@ -51,7 +63,7 @@ impl PPMRender {
         writeln!(out, "P3\n{} {}\n255", image_width, image_height)?;
 
         for j in (0..image_height).rev() {
-            progress(j as f64 / d);
+            progress(1f64 - j as f64 / d);
             for i in 0..image_width {
                 let color = self.render(
                     (i, j),

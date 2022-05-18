@@ -1,5 +1,6 @@
 use crate::{point3::Point3, ray::Ray, utils::random_vec3_in_unit_circle, vec3::Vec3};
 
+#[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub struct Camera {
     origin: Point3,

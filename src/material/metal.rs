@@ -1,10 +1,4 @@
-use crate::{
-    color::{primary_color::WHITE, Color},
-    hittable::HitRecord,
-    ray::Ray,
-    utils::refleract,
-    vec3::Vec3,
-};
+use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::refleract, vec3::Vec3};
 
 use super::Material;
 
@@ -17,7 +11,7 @@ pub struct Metal {
 impl Default for Metal {
     fn default() -> Self {
         Self {
-            albedo: WHITE,
+            albedo: Color::white(),
             fuzz: 0f64,
         }
     }

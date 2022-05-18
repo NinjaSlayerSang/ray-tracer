@@ -1,10 +1,4 @@
-use crate::{
-    color::{primary_color::WHITE, Color},
-    hittable::HitRecord,
-    ray::Ray,
-    utils::random_unit_vec3,
-    vec3::Vec3,
-};
+use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::random_unit_vec3, vec3::Vec3};
 
 use super::Material;
 
@@ -15,7 +9,9 @@ pub struct Lambertian {
 
 impl Default for Lambertian {
     fn default() -> Self {
-        Self { albedo: WHITE }
+        Self {
+            albedo: Color::white(),
+        }
     }
 }
 

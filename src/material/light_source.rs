@@ -1,8 +1,4 @@
-use crate::{
-    color::{primary_color::WHITE, Color},
-    hittable::HitRecord,
-    ray::Ray,
-};
+use crate::{color::Color, hittable::HitRecord, ray::Ray};
 
 use super::Material;
 
@@ -13,7 +9,9 @@ pub struct LightSource {
 
 impl Default for LightSource {
     fn default() -> Self {
-        Self { light: WHITE }
+        Self {
+            light: Color::white(),
+        }
     }
 }
 

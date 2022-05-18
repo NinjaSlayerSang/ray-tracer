@@ -8,7 +8,7 @@ Each time when Vec3 called by method or invloved in calculation,
 it will be copied as base value type like "integer" or "float".
 */
 #[derive(Clone, Copy, Default, PartialEq)]
-pub struct Vec3(pub f64, pub f64, pub f64);
+pub struct Vec3(f64, f64, f64);
 
 impl PartialOrd for Vec3 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {

@@ -45,7 +45,7 @@ impl Hittable for Sphere {
 
         let mut update = |t: f64| -> bool {
             rec.t = t;
-            rec.normal = (ray.at(rec.t) - center) / radius; // unit vector
+            rec.normal = Point3::vector(center, ray.at(rec.t)) / radius; // unit vector
             rec.material = self.material.clone();
             true
         };

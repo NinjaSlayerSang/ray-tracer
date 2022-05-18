@@ -1,9 +1,4 @@
-use crate::{
-    color::{primary_color::WHITE, Color},
-    hittable::HitRecord,
-    ray::Ray,
-    utils::refleract,
-};
+use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::refleract};
 
 use super::Material;
 
@@ -32,7 +27,7 @@ impl Material for Dielectric {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        *attenuation = WHITE;
+        *attenuation = Color::white();
         *scattered = Ray::new(
             ray_in.at(rec.t),
             refleract(ray_in.direction, rec.normal, self.ir, -1f64),
