@@ -1,4 +1,4 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray, utils::random_unit_vec3, vec3::Vec3};
+use crate::{color::Color, hittable::HitRecord, ray::Ray, vec3::Vec3};
 
 use super::Material;
 
@@ -31,7 +31,7 @@ impl Material for Lambertian {
     ) -> bool {
         let outward = Vec3::dot(ray_in.direction, rec.normal) <= 0f64;
         if outward {
-            let mut scatter_direction = rec.normal + random_unit_vec3();
+            let mut scatter_direction = rec.normal + Vec3::random_unit();
 
             if scatter_direction == Vec3::default() {
                 scatter_direction = rec.normal

@@ -199,8 +199,4 @@ impl Vec3 {
     pub fn projection(self, dir: Self) -> Self {
         Self::dot(self, dir) / Self::dot(dir, dir) * dir
     }
-
-    pub fn reflect(self, n: Self) -> Self {
-        self - 2 * self.projection(n)
-    }
 }

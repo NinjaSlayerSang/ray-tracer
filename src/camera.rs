@@ -1,4 +1,4 @@
-use crate::{point3::Point3, ray::Ray, utils::random_vec3_in_unit_circle, vec3::Vec3};
+use crate::{point3::Point3, ray::Ray, utils::random_xy_in_circle, vec3::Vec3};
 
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
@@ -52,8 +52,8 @@ impl Camera {
     }
 
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        let rd = self.lens_radius * random_vec3_in_unit_circle();
-        let offset = self.u * rd.x() + self.v * rd.y();
+        let (x, y) = random_xy_in_circle(self.lens_radius);
+        let offset = x * self.u + y * self.v;
         let origin = self.origin + offset;
         Ray::new(
             origin,

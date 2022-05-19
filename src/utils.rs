@@ -21,22 +21,15 @@ pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRea
     }
 }
 
-pub fn random_unit_vec3() -> Vec3 {
+pub fn random_xy_in_circle(radius: f64) -> (f64, f64) {
     let theta = thread_rng().gen_range(0f64..=TAU);
-    let phi = thread_rng().gen_range(0f64..=TAU);
-    let sin_theta = theta.sin();
-    Vec3::new(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
-}
-
-pub fn random_vec3_in_unit_circle() -> Vec3 {
-    let theta = thread_rng().gen_range(0f64..=TAU);
-    let r = thread_rng().gen::<f64>();
-    Vec3::new(r * theta.cos(), r * theta.sin(), 0)
+    let r = thread_rng().gen_range(0f64..=radius);
+    (r * theta.cos(), r * theta.sin())
 }
 
 fn refractance(cosine: f64, ref_idx: f64) -> bool {
     let r0 = ((1f64 - ref_idx) / (1f64 + ref_idx)).powi(2);
-    r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen()
+    r0 + (1f64 - r0) * (1f64 - cosine).powi(5) < thread_rng().gen::<f64>()
 }
 
 pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
@@ -60,7 +53,7 @@ pub fn refleract(v: Vec3, un: Vec3, eta: f64, fuzz: f64) -> Vec3 {
     let reflected = v - 2f64 * cos_theta_lv * un;
 
     if fuzz > 0f64 {
-        reflected + fuzz * cos_theta_lv * random_unit_vec3()
+        reflected + fuzz * cos_theta_lv * Vec3::random_unit()
     } else {
         reflected
     }
