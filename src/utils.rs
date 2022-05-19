@@ -71,7 +71,7 @@ pub struct LinearGradientColor(Color, Color);
 
 impl Default for LinearGradientColor {
     fn default() -> Self {
-        Self(Color::default(), Color::white())
+        Self(Default::default(), Color::white())
     }
 }
 

@@ -16,10 +16,10 @@ pub struct HitRecord {
 impl Default for HitRecord {
     fn default() -> Self {
         Self {
-            t: f64::default(),
-            normal: Vec3::default(),
+            t: Default::default(),
+            normal: Default::default(),
             material: Rc::new(Empty::default()),
-            ctx: Context::default(),
+            ctx: Default::default(),
         }
     }
 }

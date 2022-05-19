@@ -40,7 +40,7 @@ impl Color {
         Self::new(self.x().powf(exp), self.y().powf(exp), self.z().powf(exp))
     }
 
-    pub fn into_rgb_str(&self) -> String {
+    pub fn into_rgb_str(self) -> String {
         let (min, max) = (0f64, 1f64);
         format!(
             "{:.0} {:.0} {:.0}",

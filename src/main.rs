@@ -105,9 +105,9 @@ fn main() {
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     #[allow(unused_variables)]
-    let random_sampler = RandomSampler(50);
+    let random_sampler = RandomSampler(100);
     #[allow(unused_variables)]
-    let grid_sampler = GridSampler(7);
+    let grid_sampler = GridSampler(10);
 
     // World & Scene
 
@@ -152,8 +152,6 @@ fn main() {
     let mut std_out = stdout();
 
     PPMRender::default()
-        .set_depth(64)
-        .set_gamma(2.2)
         .draw(
             &mut out_file,
             image_size,

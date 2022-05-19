@@ -17,7 +17,7 @@ impl Default for PPMRender {
         Self {
             t_range: (0.001, f64::MAX),
             dissipation: Default::default(),
-            depth: 64,
+            depth: 100,
             gamma: 2.2,
         }
     }

@@ -54,12 +54,10 @@ impl Hittable for Sphere {
             QuadraticEquationRealRoot::Double(t1, t2) => {
                 if t_min < t1 && t1 < t_max {
                     update(t1)
+                } else if t_min < t2 && t2 < t_max {
+                    update(t2)
                 } else {
-                    if t_min < t2 && t2 < t_max {
-                        update(t2)
-                    } else {
-                        false
-                    }
+                    false
                 }
             }
             QuadraticEquationRealRoot::Single(t) => {
