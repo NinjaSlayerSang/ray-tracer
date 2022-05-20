@@ -1,5 +1,7 @@
 mod ppm_render;
 
+use std::sync::Arc;
+
 use crate::{
     camera::Camera,
     color::Color,
@@ -12,8 +14,8 @@ pub use ppm_render::PPMRender;
 
 fn ray_color(
     ray: &Ray,
-    hittable: &impl Hittable,
-    scene: &impl Scene,
+    hittable: Arc<dyn Hittable>,
+    scene: Arc<dyn Scene>,
     t_range: (f64, f64),
     dissipation: Color,
     depth: i32,
@@ -43,10 +45,10 @@ fn ray_color(
 pub fn render(
     pixel_coord: (i32, i32),
     image_size: (i32, i32),
-    sampler: &(impl IntoIterator<Item = (f64, f64)> + Copy),
-    camera: &Camera,
-    hittable: &impl Hittable,
-    scene: &impl Scene,
+    sampler: impl IntoIterator<Item = (f64, f64)> + Copy,
+    camera: Arc<Camera>,
+    hittable: Arc<dyn Hittable>,
+    scene: Arc<dyn Scene>,
     t_range: (f64, f64),
     dissipation: Color,
     depth: i32,
@@ -59,12 +61,19 @@ pub fn render(
     let mut pixel_color = Color::default();
     let mut count = 0;
 
-    for (u, v) in *sampler {
+    for (u, v) in sampler {
         let s = (i + u) / width;
         let t = (j + v) / height;
         let ray = camera.get_ray(s, t);
 
-        pixel_color += ray_color(&ray, hittable, scene, t_range, dissipation, depth);
+        pixel_color += ray_color(
+            &ray,
+            hittable.clone(),
+            scene.clone(),
+            t_range,
+            dissipation,
+            depth,
+        );
         count += 1;
     }
 

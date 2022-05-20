@@ -1,4 +1,8 @@
-use std::io::{Result, Write};
+use std::{
+    io::{Result, Write},
+    sync::Arc,
+    thread::spawn,
+};
 
 use crate::{camera::Camera, color::Color, hittable::Hittable, scene::Scene};
 
@@ -52,10 +56,10 @@ impl PPMRender {
         &self,
         out: &mut impl Write,
         image_size: (i32, i32),
-        sampler: &(impl IntoIterator<Item = (f64, f64)> + Copy),
-        camera: &Camera,
-        hittable: &impl Hittable,
-        scene: &impl Scene,
+        sampler: impl IntoIterator<Item = (f64, f64)> + Copy + Send + 'static,
+        camera: Arc<Camera>,
+        hittable: Arc<dyn Hittable + Send + Sync>,
+        scene: Arc<dyn Scene + Send + Sync>,
         progress: &mut impl FnMut(f64),
     ) -> Result<()> {
         let (image_width, image_height) = image_size;
@@ -65,13 +69,37 @@ impl PPMRender {
         for j in (0..image_height).rev() {
             progress(1f64 - j as f64 / d);
             for i in 0..image_width {
+                if false {
+                    let t_range = self.t_range;
+                    let dissipation = self.dissipation;
+                    let depth = self.depth;
+                    let gamma = self.gamma;
+                    let shared_camera = camera.clone();
+                    let shared_hittable = hittable.clone();
+                    let shared_scene = scene.clone();
+                    spawn(move || {
+                        render(
+                            (i, j),
+                            image_size,
+                            sampler,
+                            shared_camera,
+                            shared_hittable,
+                            shared_scene,
+                            t_range,
+                            dissipation,
+                            depth,
+                            gamma,
+                        )
+                    });
+                }
+
                 let color = render(
                     (i, j),
                     image_size,
                     sampler,
-                    camera,
-                    hittable,
-                    scene,
+                    camera.clone(),
+                    hittable.clone(),
+                    scene.clone(),
                     self.t_range,
                     self.dissipation,
                     self.depth,

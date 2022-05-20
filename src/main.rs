@@ -14,7 +14,7 @@ use std::{
     env::args,
     fs::File,
     io::{stdout, Write},
-    rc::Rc,
+    sync::Arc,
 };
 
 use camera::Camera;
@@ -32,10 +32,10 @@ use vec3::Vec3;
 fn demo_random_world() -> HittableList {
     let mut world = HittableList::default();
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
-        Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))),
+        Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))),
     )));
 
     let anchor = Point3::new(4, 0.2, 0);
@@ -50,49 +50,49 @@ fn demo_random_world() -> HittableList {
                 let choose_mat = thread_rng().gen::<f64>();
                 if choose_mat < 0.4 {
                     // diffuse
-                    world.add(Rc::new(Sphere::new(
+                    world.add(Arc::new(Sphere::new(
                         center,
                         0.2,
-                        Rc::new(Lambertian::new(Color::random() * Color::random())),
+                        Arc::new(Lambertian::new(Color::random() * Color::random())),
                     )));
                 } else if choose_mat < 0.85 {
                     // metal
-                    world.add(Rc::new(Sphere::new(
+                    world.add(Arc::new(Sphere::new(
                         center,
                         0.2,
-                        Rc::new(Metal::new(
+                        Arc::new(Metal::new(
                             Color::random_range(0.5..=1.0),
                             thread_rng().gen_range(0.0..=0.5),
                         )),
                     )));
                 } else {
                     // glass
-                    world.add(Rc::new(Sphere::new(
+                    world.add(Arc::new(Sphere::new(
                         center,
                         0.2,
-                        Rc::new(Dielectric::new(1.5)),
+                        Arc::new(Dielectric::new(1.5)),
                     )));
                 }
             }
         }
     }
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         Point3::new(0, 1, 0),
         1.0,
-        Rc::new(Dielectric::new(1.5)),
+        Arc::new(Dielectric::new(1.5)),
     )));
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         Point3::new(-4, 1, 0),
         1.0,
-        Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))),
+        Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))),
     )));
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         Point3::new(4, 1, 0),
         1.0,
-        Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
+        Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
     )));
 
     world
@@ -115,11 +115,13 @@ fn main() {
 
     let sun_position = Vec3::new(-300, 1500, 300);
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         sun_position,
         300.0,
-        Rc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
+        Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
     )));
+
+    let world = world;
 
     let scene = Sky::new(
         sun_position,
@@ -155,10 +157,10 @@ fn main() {
         .draw(
             &mut out_file,
             image_size,
-            &grid_sampler,
-            &camera,
-            &world,
-            &scene,
+            grid_sampler,
+            Arc::new(camera),
+            Arc::new(world),
+            Arc::new(scene),
             &mut |p: f64| {
                 write!(std_out, "\rprogress: {:.1}%", p * 100.0).unwrap();
                 std_out.flush().unwrap();
@@ -166,8 +168,4 @@ fn main() {
         )
         .unwrap();
     writeln!(std_out, "\nDone.").unwrap();
-
-    // Clear
-
-    world.clear();
 }

@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     material::{Context, Empty, Material},
@@ -9,7 +9,7 @@ use crate::{
 pub struct HitRecord {
     pub t: f64,
     pub normal: Vec3,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
     pub ctx: Context,
 }
 
@@ -18,7 +18,7 @@ impl Default for HitRecord {
         Self {
             t: Default::default(),
             normal: Default::default(),
-            material: Rc::new(Empty::default()),
+            material: Arc::new(Empty::default()),
             ctx: Default::default(),
         }
     }
