@@ -2,7 +2,7 @@ use std::io::{Result, Write};
 
 use crate::{camera::Camera, color::Color, hittable::Hittable, scene::Scene};
 
-use super::Render;
+use super::render;
 
 #[derive(Clone, Copy)]
 pub struct PPMRender {
@@ -65,7 +65,7 @@ impl PPMRender {
         for j in (0..image_height).rev() {
             progress(1f64 - j as f64 / d);
             for i in 0..image_width {
-                let color = self.render(
+                let color = render(
                     (i, j),
                     image_size,
                     sampler,
@@ -84,5 +84,3 @@ impl PPMRender {
         Ok(())
     }
 }
-
-impl Render for PPMRender {}
