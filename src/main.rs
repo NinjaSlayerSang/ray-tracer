@@ -150,22 +150,27 @@ fn main() {
     // Render
 
     let out_file_path = &args().collect::<Vec<String>>()[1];
-    let mut out_file = File::create(out_file_path).unwrap();
-    let mut std_out = stdout();
+    let out_file = File::create(out_file_path).unwrap();
 
     PPMRender::default()
         .draw(
-            &mut out_file,
+            out_file,
             image_size,
             grid_sampler,
             Arc::new(camera),
             Arc::new(world),
             Arc::new(scene),
-            &mut |p: f64| {
-                write!(std_out, "\rprogress: {:.1}%", p * 100.0).unwrap();
-                std_out.flush().unwrap();
+            5,
+            |progress: Option<f64>| {
+                let mut std_out = stdout();
+
+                if let Some(p) = progress {
+                    write!(std_out, "\rprogress: {:.1}%", p * 100.0).unwrap();
+                    std_out.flush().unwrap();
+                } else {
+                    writeln!(std_out, "\nDone.").unwrap();
+                }
             },
         )
         .unwrap();
-    writeln!(std_out, "\nDone.").unwrap();
 }

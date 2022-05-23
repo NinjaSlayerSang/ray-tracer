@@ -1,7 +1,8 @@
 use std::{
-    io::{Result, Write},
-    sync::Arc,
+    io::Write,
+    sync::{mpsc, Arc, Condvar, Mutex},
     thread::spawn,
+    thread::Result,
 };
 
 use crate::{camera::Camera, color::Color, hittable::Hittable, scene::Scene};
@@ -54,22 +55,62 @@ impl PPMRender {
 impl PPMRender {
     pub fn draw(
         &self,
-        out: &mut impl Write,
-        image_size: (i32, i32),
+        mut out: impl Write + Send + 'static,
+        image_size: (usize, usize),
         sampler: impl IntoIterator<Item = (f64, f64)> + Copy + Send + 'static,
         camera: Arc<Camera>,
         hittable: Arc<dyn Hittable + Send + Sync>,
         scene: Arc<dyn Scene + Send + Sync>,
-        progress: &mut impl FnMut(f64),
+        concurrent_capacity: i32,
+        mut progress: impl FnMut(Option<f64>) + Send + 'static,
     ) -> Result<()> {
         let (image_width, image_height) = image_size;
-        let d = image_height as f64;
-        writeln!(out, "P3\n{} {}\n255", image_width, image_height)?;
+        let capacity = (image_width * image_height) as f64;
 
-        for j in (0..image_height).rev() {
-            progress(1f64 - j as f64 / d);
-            for i in 0..image_width {
-                if false {
+        let handle = {
+            let (result_sender, result_receiver) = mpsc::channel::<(usize, Color)>();
+
+            let handle = spawn(move || {
+                writeln!(out, "P3\n{} {}\n255", image_width, image_height).unwrap();
+
+                let mut offset = 0usize;
+                let mut cache =
+                    Vec::<(usize, Color)>::with_capacity((2 * concurrent_capacity) as usize);
+
+                for result in result_receiver {
+                    // enqueue
+                    let mut index = cache.len();
+                    for (i, item) in cache.iter().enumerate() {
+                        if item.0 > result.0 {
+                            index = i;
+                            break;
+                        }
+                    }
+                    cache.insert(index, result);
+
+                    // outqueue
+                    while cache.len() > 0 && cache[0].0 == offset {
+                        offset += 1;
+                        writeln!(out, "{}", cache.remove(0).1.into_rgb_str()).unwrap();
+                    }
+
+                    progress(Some(offset as f64 / capacity));
+                }
+
+                progress(None);
+            });
+
+            let semaphore = Arc::new((Mutex::new(concurrent_capacity), Condvar::new()));
+
+            let mut index = 0;
+            for j in (0..image_height).rev() {
+                for i in 0..image_width {
+                    let (lock, cvar) = &*semaphore;
+                    {
+                        let mut k = cvar.wait_while(lock.lock().unwrap(), |k| *k <= 0).unwrap();
+                        *k -= 1;
+                    }
+
                     let t_range = self.t_range;
                     let dissipation = self.dissipation;
                     let depth = self.depth;
@@ -77,8 +118,10 @@ impl PPMRender {
                     let shared_camera = camera.clone();
                     let shared_hittable = hittable.clone();
                     let shared_scene = scene.clone();
+                    let tx = result_sender.clone();
+                    let shared_semaphore = semaphore.clone();
                     spawn(move || {
-                        render(
+                        let color = render(
                             (i, j),
                             image_size,
                             sampler,
@@ -89,26 +132,25 @@ impl PPMRender {
                             dissipation,
                             depth,
                             gamma,
-                        )
+                        );
+
+                        tx.send((index, color)).unwrap();
+
+                        let (lock, cvar) = &*shared_semaphore;
+                        {
+                            let mut k = lock.lock().unwrap();
+                            *k += 1;
+                        }
+                        cvar.notify_one();
                     });
+
+                    index += 1;
                 }
-
-                let color = render(
-                    (i, j),
-                    image_size,
-                    sampler,
-                    camera.clone(),
-                    hittable.clone(),
-                    scene.clone(),
-                    self.t_range,
-                    self.dissipation,
-                    self.depth,
-                    self.gamma,
-                );
-                writeln!(out, "{}", color.into_rgb_str())?;
             }
-        }
 
-        Ok(())
+            handle
+        };
+
+        handle.join()
     }
 }

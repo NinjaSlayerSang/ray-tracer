@@ -43,8 +43,8 @@ fn ray_color(
 }
 
 pub fn render(
-    pixel_coord: (i32, i32),
-    image_size: (i32, i32),
+    pixel_coord: (usize, usize),
+    image_size: (usize, usize),
     sampler: impl IntoIterator<Item = (f64, f64)> + Copy,
     camera: Arc<Camera>,
     hittable: Arc<dyn Hittable>,
