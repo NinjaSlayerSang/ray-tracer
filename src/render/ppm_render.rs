@@ -15,6 +15,7 @@ pub struct PPMRender {
     dissipation: Color,
     depth: i32,
     gamma: f64,
+    concurrent: usize,
 }
 
 impl Default for PPMRender {
@@ -24,6 +25,7 @@ impl Default for PPMRender {
             dissipation: Default::default(),
             depth: 100,
             gamma: 2.2,
+            concurrent: 4,
         }
     }
 }
@@ -50,6 +52,11 @@ impl PPMRender {
         self.gamma = gamma;
         self
     }
+
+    pub fn set_concurrent(mut self, concurrent: usize) -> Self {
+        self.concurrent = concurrent;
+        self
+    }
 }
 
 impl PPMRender {
@@ -61,7 +68,6 @@ impl PPMRender {
         camera: Arc<Camera>,
         hittable: Arc<dyn Hittable + Send + Sync>,
         scene: Arc<dyn Scene + Send + Sync>,
-        concurrent_capacity: i32,
         mut progress: impl FnMut(Option<f64>) + Send + 'static,
     ) -> Result<()> {
         let (image_width, image_height) = image_size;
@@ -70,12 +76,12 @@ impl PPMRender {
         let handle = {
             let (result_sender, result_receiver) = mpsc::channel::<(usize, Color)>();
 
+            let concurrent = self.concurrent;
             let handle = spawn(move || {
                 writeln!(out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
                 let mut offset = 0usize;
-                let mut cache =
-                    Vec::<(usize, Color)>::with_capacity((2 * concurrent_capacity) as usize);
+                let mut cache = Vec::<(usize, Color)>::with_capacity(2 * concurrent);
 
                 for result in result_receiver {
                     // enqueue
@@ -100,7 +106,7 @@ impl PPMRender {
                 progress(None);
             });
 
-            let semaphore = Arc::new((Mutex::new(concurrent_capacity), Condvar::new()));
+            let semaphore = Arc::new((Mutex::new(self.concurrent as i32), Condvar::new()));
 
             let mut index = 0;
             for j in (0..image_height).rev() {

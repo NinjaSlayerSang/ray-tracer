@@ -160,7 +160,6 @@ fn main() {
             Arc::new(camera),
             Arc::new(world),
             Arc::new(scene),
-            5,
             |progress: Option<f64>| {
                 let mut std_out = stdout();
 
