@@ -95,7 +95,7 @@ impl PPMRender {
                     cache.insert(index, result);
 
                     // outqueue
-                    while cache.len() > 0 && cache[0].0 == offset {
+                    while !cache.is_empty() && cache[0].0 == offset {
                         offset += 1;
                         writeln!(out, "{}", cache.remove(0).1.into_rgb_str()).unwrap();
                     }

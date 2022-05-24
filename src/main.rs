@@ -136,6 +136,7 @@ fn main() {
     let vfov = 20.0;
     let aperture = 0.1;
     let focus_dist = 10.0;
+    let time_range = (0.0, 1.0);
 
     let camera = Camera::new(
         look_from,
@@ -145,6 +146,7 @@ fn main() {
         aspect_ratio,
         aperture,
         focus_dist,
+        time_range,
     );
 
     // Render
