@@ -55,12 +55,13 @@ impl Camera {
         let (x, y) = random_xy_in_circle(self.lens_radius);
         let offset = x * self.u + y * self.v;
         let origin = self.origin + offset;
-        Ray::new(
+        Ray {
             origin,
-            Point3::vector(
+            direction: Point3::vector(
                 origin,
                 self.lower_left_corner + s * self.horizontal + t * self.vertical,
             ),
-        )
+            time: 0f64,
+        }
     }
 }

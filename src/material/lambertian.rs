@@ -38,7 +38,11 @@ impl Material for Lambertian {
             }
 
             *attenuation = self.albedo;
-            *scattered = Ray::new(ray_in.at(rec.t), scatter_direction);
+            *scattered = Ray {
+                origin: ray_in.at(rec.t),
+                direction: scatter_direction,
+                time: 0f64,
+            };
             true
         } else {
             *attenuation = Color::default();

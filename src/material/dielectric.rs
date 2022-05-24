@@ -28,10 +28,11 @@ impl Material for Dielectric {
         scattered: &mut Ray,
     ) -> bool {
         *attenuation = Color::white();
-        *scattered = Ray::new(
-            ray_in.at(rec.t),
-            refleract(ray_in.direction, rec.normal, self.ir, -1f64),
-        );
+        *scattered = Ray {
+            origin: ray_in.at(rec.t),
+            direction: refleract(ray_in.direction, rec.normal, self.ir, -1f64),
+            time: 0f64,
+        };
         true
     }
 }

@@ -37,10 +37,11 @@ impl Material for Metal {
         let outward = Vec3::dot(ray_in.direction, rec.normal) <= 0f64;
         if outward {
             *attenuation = self.albedo;
-            *scattered = Ray::new(
-                ray_in.at(rec.t),
-                refleract(ray_in.direction, rec.normal, -1f64, self.fuzz),
-            );
+            *scattered = Ray {
+                origin: ray_in.at(rec.t),
+                direction: refleract(ray_in.direction, rec.normal, -1f64, self.fuzz),
+                time: 0f64,
+            };
             true
         } else {
             *attenuation = Color::default();
