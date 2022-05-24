@@ -164,7 +164,7 @@ fn main() {
                 let mut std_out = stdout();
 
                 if let Some(p) = progress {
-                    write!(std_out, "\rprogress: {:.1}%", p * 100.0).unwrap();
+                    write!(std_out, "\rprogress: {:.2}%", p * 100.0).unwrap();
                     std_out.flush().unwrap();
                 } else {
                     writeln!(std_out, "\nDone.").unwrap();

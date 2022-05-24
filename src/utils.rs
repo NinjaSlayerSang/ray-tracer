@@ -10,14 +10,17 @@ pub enum QuadraticEquationRealRoot {
 }
 
 pub fn solve_quadratic_equation(a: f64, hb: f64, c: f64) -> QuadraticEquationRealRoot {
+    use Ordering::{Equal, Greater};
+    use QuadraticEquationRealRoot::{Double, None, Single};
+
     let d = hb * hb - a * c;
     match d.partial_cmp(&0f64) {
-        Some(Ordering::Greater) => {
+        Some(Greater) => {
             let sd = d.sqrt();
-            QuadraticEquationRealRoot::Double((-hb - sd) / a, (-hb + sd) / a)
+            Double((-hb - sd) / a, (-hb + sd) / a)
         }
-        Some(Ordering::Equal) => QuadraticEquationRealRoot::Single(-hb / a),
-        _ => QuadraticEquationRealRoot::None,
+        Some(Equal) => Single(-hb / a),
+        _ => None,
     }
 }
 

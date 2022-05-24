@@ -1,6 +1,6 @@
 use std::{
     io::Write,
-    sync::{mpsc, Arc, Condvar, Mutex},
+    sync::{mpsc::channel, Arc, Condvar, Mutex},
     thread::spawn,
     thread::Result,
 };
@@ -68,13 +68,13 @@ impl PPMRender {
         camera: Arc<Camera>,
         hittable: Arc<dyn Hittable + Send + Sync>,
         scene: Arc<dyn Scene + Send + Sync>,
-        mut progress: impl FnMut(Option<f64>) + Send + 'static,
+        progress: impl Fn(Option<f64>) + Send + 'static,
     ) -> Result<()> {
         let (image_width, image_height) = image_size;
         let capacity = (image_width * image_height) as f64;
 
         let handle = {
-            let (result_sender, result_receiver) = mpsc::channel::<(usize, Color)>();
+            let (result_sender, result_receiver) = channel::<(usize, Color)>();
 
             let concurrent = self.concurrent;
             let handle = spawn(move || {
@@ -111,9 +111,9 @@ impl PPMRender {
             let mut index = 0;
             for j in (0..image_height).rev() {
                 for i in 0..image_width {
-                    let (lock, cvar) = &*semaphore;
+                    let (mtx, cvar) = &*semaphore;
                     {
-                        let mut k = cvar.wait_while(lock.lock().unwrap(), |k| *k <= 0).unwrap();
+                        let mut k = cvar.wait_while(mtx.lock().unwrap(), |k| *k <= 0).unwrap();
                         *k -= 1;
                     }
 
@@ -124,7 +124,7 @@ impl PPMRender {
                     let shared_camera = camera.clone();
                     let shared_hittable = hittable.clone();
                     let shared_scene = scene.clone();
-                    let tx = result_sender.clone();
+                    let shared_result_sender = result_sender.clone();
                     let shared_semaphore = semaphore.clone();
                     spawn(move || {
                         let color = render(
@@ -140,11 +140,11 @@ impl PPMRender {
                             gamma,
                         );
 
-                        tx.send((index, color)).unwrap();
+                        shared_result_sender.send((index, color)).unwrap();
 
-                        let (lock, cvar) = &*shared_semaphore;
+                        let (mtx, cvar) = &*shared_semaphore;
                         {
-                            let mut k = lock.lock().unwrap();
+                            let mut k = mtx.lock().unwrap();
                             *k += 1;
                         }
                         cvar.notify_one();
