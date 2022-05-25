@@ -23,3 +23,5 @@ cargo run --release -- image.ppm
 # test
 cargo test --test ${test_crate_name} -- --color always --show-output
 ```
+
+![image](https://user-images.githubusercontent.com/31197208/170239680-b4f41d38-4b29-43fc-b182-64ff1cf54782.png)
