@@ -9,7 +9,7 @@ An excellent series of primer tutorial books for this fascinating Computer Graph
 # Multiple Threads
 
 Render rays' color in mutiple threads, only invloving Rust standard library.
-Learn how to use std::sync::Arc sharing pointers among threads, std::sync::mpsc::channel sending messages between threads, and std::sync::Mutex & std::sync::Condvar implementing a *Semaphore* to control the amount of active threads.
+Learn how to use **std::sync::Arc** sharing pointers among threads, **std::sync::mpsc::channel** sending messages between threads, and **std::sync::Mutex** & **std::sync::Condvar** implementing a *Semaphore* to control the amount of active threads.
 
 # Run
 
