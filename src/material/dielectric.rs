@@ -31,7 +31,7 @@ impl Material for Dielectric {
         *scattered = Ray {
             origin: ray_in.at(rec.t),
             direction: refleract(ray_in.direction, rec.normal, self.ir, -1f64),
-            time: 0f64,
+            time: ray_in.time,
         };
         true
     }

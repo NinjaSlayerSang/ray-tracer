@@ -11,29 +11,42 @@ use crate::{
 use super::{HitRecord, Hittable};
 
 #[derive(Clone)]
-pub struct Sphere {
-    center: Point3,
+pub struct MovingSphere {
+    center_range: (Point3, Point3),
+    time_range: (f64, f64),
     radius: f64,
     material: Arc<dyn Material + Send + Sync>,
 }
 
-impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Self {
+impl MovingSphere {
+    pub fn new(
+        center_range: (Point3, Point3),
+        time_range: (f64, f64),
+        radius: f64,
+        material: Arc<dyn Material + Send + Sync>,
+    ) -> Self {
         Self {
-            center,
+            center_range,
+            time_range,
             radius,
             material,
         }
     }
+
+    pub fn center(&self, time: f64) -> Point3 {
+        let (center0, center1) = self.center_range;
+        let (time0, time1) = self.time_range;
+        center0 + (time - time0) / (time1 - time0) * Vec3::vector(center0, center1)
+    }
 }
 
-impl Hittable for Sphere {
+impl Hittable for MovingSphere {
     fn hit(&self, ray: &Ray, t_range: (f64, f64), rec: &mut HitRecord) -> bool {
         use QuadraticEquationRealRoot::{Double, Single};
 
         let (t_min, t_max) = t_range;
 
-        let center = self.center;
+        let center = self.center(ray.time);
         let radius = self.radius;
         let origin = ray.origin;
         let direction = ray.direction;

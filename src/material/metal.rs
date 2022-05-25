@@ -40,7 +40,7 @@ impl Material for Metal {
             *scattered = Ray {
                 origin: ray_in.at(rec.t),
                 direction: refleract(ray_in.direction, rec.normal, -1f64, self.fuzz),
-                time: 0f64,
+                time: ray_in.time,
             };
             true
         } else {

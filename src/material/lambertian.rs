@@ -41,7 +41,7 @@ impl Material for Lambertian {
             *scattered = Ray {
                 origin: ray_in.at(rec.t),
                 direction: scatter_direction,
-                time: 0f64,
+                time: ray_in.time,
             };
             true
         } else {

@@ -19,7 +19,7 @@ use std::{
 
 use camera::Camera;
 use color::Color;
-use hittable::{HittableList, Sphere};
+use hittable::{HittableList, MovingSphere, Sphere};
 use material::{Dielectric, Lambertian, LightSource, Metal};
 use point3::Point3;
 use rand::{thread_rng, Rng};
@@ -48,7 +48,18 @@ fn demo_random_world() -> HittableList {
             );
             if (center - anchor).length() > 0.9 {
                 let choose_mat = thread_rng().gen::<f64>();
-                if choose_mat < 0.4 {
+                if choose_mat < 0.15 {
+                    // moving
+                    world.add(Arc::new(MovingSphere::new(
+                        (
+                            center,
+                            center + Vec3::new(0, thread_rng().gen_range(0.0..=0.5), 0),
+                        ),
+                        (0.0, 1.0),
+                        0.2,
+                        Arc::new(Lambertian::new(Color::random() * Color::random())),
+                    )))
+                } else if choose_mat < 0.4 {
                     // diffuse
                     world.add(Arc::new(Sphere::new(
                         center,
