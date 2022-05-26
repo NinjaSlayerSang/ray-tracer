@@ -18,8 +18,7 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
-        look_from: Point3,
-        look_at: Point3,
+        look: (Point3, Point3),
         vup: Vec3,
         vfov: f64,
         aspect_ratio: f64,
@@ -27,6 +26,7 @@ impl Camera {
         focus_dist: f64,
         time_range: (f64, f64),
     ) -> Self {
+        let (look_from, look_at) = look;
         let theta = vfov.to_radians();
         let h = (theta / 2f64).tan();
         let viewport_height = 2f64 * h;

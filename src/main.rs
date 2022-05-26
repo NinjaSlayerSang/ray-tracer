@@ -7,6 +7,7 @@ mod ray;
 mod render;
 mod sampler;
 mod scene;
+mod semaphore;
 mod utils;
 mod vec3;
 
@@ -132,8 +133,6 @@ fn main() {
         Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
     )));
 
-    let world = world;
-
     let scene = Sky::new(
         sun_position,
         LinearGradientColor::new(Color::new(0.0, 0.1, 0.2), Color::new(0.5, 0.7, 1.0)),
@@ -150,8 +149,7 @@ fn main() {
     let time_range = (0.0, 1.0);
 
     let camera = Camera::new(
-        look_from,
-        look_at,
+        (look_from, look_at),
         vup,
         vfov,
         aspect_ratio,

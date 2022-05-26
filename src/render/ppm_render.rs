@@ -1,11 +1,11 @@
 use std::{
     io::Write,
-    sync::{mpsc::channel, Arc, Condvar, Mutex},
+    sync::{mpsc::channel, Arc},
     thread::spawn,
     thread::Result,
 };
 
-use crate::{camera::Camera, color::Color, hittable::Hittable, scene::Scene};
+use crate::{camera::Camera, color::Color, hittable::Hittable, scene::Scene, semaphore::Semaphore};
 
 use super::render;
 
@@ -106,16 +106,12 @@ impl PPMRender {
                 progress(None);
             });
 
-            let semaphore = Arc::new((Mutex::new(self.concurrent as i32), Condvar::new()));
+            let semaphore = Arc::new(Semaphore::new(self.concurrent as isize));
 
             let mut index = 0;
             for j in (0..image_height).rev() {
                 for i in 0..image_width {
-                    let (mtx, cvar) = &*semaphore;
-                    {
-                        let mut k = cvar.wait_while(mtx.lock().unwrap(), |k| *k <= 0).unwrap();
-                        *k -= 1;
-                    }
+                    semaphore.acquire();
 
                     let t_range = self.t_range;
                     let dissipation = self.dissipation;
@@ -142,12 +138,7 @@ impl PPMRender {
 
                         shared_result_sender.send((index, color)).unwrap();
 
-                        let (mtx, cvar) = &*shared_semaphore;
-                        {
-                            let mut k = mtx.lock().unwrap();
-                            *k += 1;
-                        }
-                        cvar.notify_one();
+                        shared_semaphore.release();
                     });
 
                     index += 1;

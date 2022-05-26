@@ -18,7 +18,7 @@ Install Rust toolchain before running.
 ```shell
 # main
 cargo run --release -- image.ppm
-# add "--release" unless you have enough patient to wait for much longer time...
+# add "--release" unless you have enough patience to wait for much longer time...
 
 # test
 cargo test --test ${test_crate_name} -- --color always --show-output
