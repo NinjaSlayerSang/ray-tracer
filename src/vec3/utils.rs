@@ -11,3 +11,9 @@ impl Vec3 {
         Self(sin_theta * phi.cos(), sin_theta * phi.sin(), theta.cos())
     }
 }
+
+impl Into<[f64; 3]> for Vec3 {
+    fn into(self) -> [f64; 3] {
+        [self.0, self.1, self.2]
+    }
+}

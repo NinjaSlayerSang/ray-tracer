@@ -2,6 +2,7 @@ use rand::{thread_rng, Rng};
 
 use super::SampleFactor;
 
+#[derive(Clone, Copy)]
 pub struct RandomSamplerIter {
     n: i32,
 }

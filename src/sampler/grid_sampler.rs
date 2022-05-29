@@ -1,5 +1,6 @@
 use super::SampleFactor;
 
+#[derive(Clone, Copy)]
 pub struct GridSamplerIter {
     i: i32,
     j: i32,

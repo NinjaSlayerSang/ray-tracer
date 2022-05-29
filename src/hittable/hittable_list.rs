@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::ray::Ray;
+use crate::{aabb::AABB, ray::Ray};
 
 use super::{HitRecord, Hittable};
 
@@ -28,5 +28,9 @@ impl Hittable for HittableList {
         }
 
         hit_anything
+    }
+
+    fn bounding_box(&self, time_range: (f64, f64), output_box: &mut AABB) -> bool {
+        true
     }
 }

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
+    aabb::AABB,
     material::Material,
     point3::Point3,
     ray::Ray,
@@ -84,5 +85,22 @@ impl Hittable for MovingSphere {
             }
             _ => false,
         }
+    }
+
+    fn bounding_box(&self, time_range: (f64, f64), output_box: &mut AABB) -> bool {
+        let (time0, time1) = time_range;
+        let radius = self.radius;
+        let radius_vector = Vec3::new(radius, radius, radius);
+        *output_box = AABB::surround(
+            AABB::new(
+                self.center(time0) - radius_vector,
+                self.center(time0) + radius_vector,
+            ),
+            AABB::new(
+                self.center(time1) - radius_vector,
+                self.center(time1) + radius_vector,
+            ),
+        );
+        true
     }
 }
