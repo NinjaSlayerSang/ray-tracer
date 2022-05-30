@@ -21,7 +21,7 @@ use std::{
 
 use camera::Camera;
 use color::Color;
-use hittable::{HittableList, MovingSphere, Sphere};
+use hittable::{BVHNode, HittableList, MovingSphere, Sphere};
 use material::{Dielectric, Lambertian, LightSource, Metal};
 use point3::Point3;
 use rand::{thread_rng, Rng};
@@ -114,7 +114,7 @@ fn demo_random_world() -> HittableList {
 fn main() {
     // Const
 
-    let image_size = (1920, 1080); // 1080p
+    let image_size = (640, 480); // 1080p
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     #[allow(unused_variables)]
@@ -163,6 +163,9 @@ fn main() {
 
     let out_file_path = &args().collect::<Vec<String>>()[1];
     let out_file = File::create(out_file_path).unwrap();
+
+    #[allow(unused_variables)]
+    let bvh_node = BVHNode::from_list(&world.objects, time_range);
 
     PPMRender::default()
         .draw(

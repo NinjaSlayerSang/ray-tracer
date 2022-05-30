@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     material::Material,
     point3::Point3,
     ray::Ray,
@@ -74,10 +74,10 @@ impl Hittable for Sphere {
         }
     }
 
-    fn bounding_box(&self, _: (f64, f64), output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, _: (f64, f64), output_box: &mut Aabb) -> bool {
         let radius = self.radius;
         let radius_vector = Vec3::new(radius, radius, radius);
-        *output_box = AABB::new(self.center - radius_vector, self.center + radius_vector);
+        *output_box = Aabb::new(self.center - radius_vector, self.center + radius_vector);
         true
     }
 }

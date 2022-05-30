@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use crate::{aabb::AABB, ray::Ray};
+use crate::{aabb::Aabb, ray::Ray};
 
 use super::{HitRecord, Hittable};
 
 #[derive(Clone, Default)]
 pub struct HittableList {
-    objects: Vec<Arc<dyn Hittable + Send + Sync>>,
+    pub objects: Vec<Arc<dyn Hittable + Send + Sync>>,
 }
 
 impl HittableList {
@@ -30,11 +30,11 @@ impl Hittable for HittableList {
         hit_anything
     }
 
-    fn bounding_box(&self, time_range: (f64, f64), output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, time_range: (f64, f64), output_box: &mut Aabb) -> bool {
         if self.objects.is_empty() {
             false
         } else {
-            let mut temp_box = AABB::default();
+            let mut temp_box = Aabb::default();
             let mut first_box = true;
 
             for object in &self.objects {

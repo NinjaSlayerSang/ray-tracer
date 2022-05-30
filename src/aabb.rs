@@ -1,14 +1,14 @@
-use std::mem::swap;
+use std::{cmp::Ordering, mem::swap};
 
 use crate::{point3::Point3, ray::Ray};
 
 #[derive(Clone, Copy, Default)]
-pub struct AABB {
+pub struct Aabb {
     a: Point3,
     b: Point3,
 }
 
-impl AABB {
+impl Aabb {
     pub fn new(a: Point3, b: Point3) -> Self {
         Self { a, b }
     }
@@ -54,5 +54,14 @@ impl AABB {
             }
         }
         true
+    }
+
+    pub fn compare(&self, other: &Self, axis: u8) -> Option<Ordering> {
+        match axis {
+            0 => self.a.x().partial_cmp(&other.a.x()),
+            1 => self.a.y().partial_cmp(&other.a.y()),
+            2 => self.a.z().partial_cmp(&other.a.z()),
+            _ => None,
+        }
     }
 }
