@@ -2,7 +2,7 @@ use std::mem::swap;
 
 use crate::{point3::Point3, ray::Ray};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct AABB {
     a: Point3,
     b: Point3,
@@ -13,17 +13,17 @@ impl AABB {
         Self { a, b }
     }
 
-    pub fn surround(l: Self, r: Self) -> Self {
+    pub fn surround(self, other: Self) -> Self {
         Self {
             a: Point3::new(
-                f64::min(l.a.x(), r.a.x()),
-                f64::min(l.a.y(), r.a.y()),
-                f64::min(l.a.z(), r.a.z()),
+                self.a.x().min(other.a.x()),
+                self.a.y().min(other.a.y()),
+                self.a.z().min(other.a.z()),
             ),
             b: Point3::new(
-                f64::max(l.b.x(), r.b.x()),
-                f64::max(l.b.y(), r.b.y()),
-                f64::max(l.b.z(), r.b.z()),
+                self.b.x().max(other.b.x()),
+                self.b.y().max(other.b.y()),
+                self.b.z().max(other.b.z()),
             ),
         }
     }

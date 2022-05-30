@@ -31,6 +31,25 @@ impl Hittable for HittableList {
     }
 
     fn bounding_box(&self, time_range: (f64, f64), output_box: &mut AABB) -> bool {
-        true
+        if self.objects.is_empty() {
+            false
+        } else {
+            let mut temp_box = AABB::default();
+            let mut first_box = true;
+
+            for object in &self.objects {
+                if !object.bounding_box(time_range, &mut temp_box) {
+                    return false;
+                }
+                *output_box = if first_box {
+                    temp_box
+                } else {
+                    output_box.surround(temp_box)
+                };
+                first_box = false;
+            }
+
+            true
+        }
     }
 }
