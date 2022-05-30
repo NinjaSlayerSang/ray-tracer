@@ -28,7 +28,7 @@ impl AABB {
         }
     }
 
-    fn hit(&self, ray: &Ray, t_range: (f64, f64)) -> bool {
+    pub fn hit(&self, ray: &Ray, t_range: (f64, f64)) -> bool {
         let (mut t_min, mut t_max) = t_range;
         let origin: [f64; 3] = ray.origin.into();
         let direction: [f64; 3] = ray.direction.into();

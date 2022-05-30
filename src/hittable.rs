@@ -1,3 +1,4 @@
+mod bvh_node;
 mod hit_record;
 mod hittable_list;
 mod moving_sphere;
