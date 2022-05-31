@@ -114,13 +114,14 @@ fn demo_random_world() -> HittableList {
 fn main() {
     // Const
 
-    let image_size = (640, 480); // 1080p
+    let image_size = (1920, 1080); // 1080p
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     #[allow(unused_variables)]
     let random_sampler = RandomSampler(100);
     #[allow(unused_variables)]
     let grid_sampler = GridSampler(10);
+    let time_range = (0.0, 1.0);
 
     // World & Scene
 
@@ -133,6 +134,8 @@ fn main() {
         300.0,
         Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
     )));
+
+    let bvh_node = BVHNode::from_list(&world.objects, time_range);
 
     let scene = Sky::new(
         sun_position,
@@ -147,7 +150,6 @@ fn main() {
     let vfov = 20.0;
     let aperture = 0.1;
     let focus_dist = 10.0;
-    let time_range = (0.0, 1.0);
 
     let camera = Camera::new(
         (look_from, look_at),
@@ -164,16 +166,13 @@ fn main() {
     let out_file_path = &args().collect::<Vec<String>>()[1];
     let out_file = File::create(out_file_path).unwrap();
 
-    #[allow(unused_variables)]
-    let bvh_node = BVHNode::from_list(&world.objects, time_range);
-
     PPMRender::default()
         .draw(
             out_file,
             image_size,
             grid_sampler,
             Arc::new(camera),
-            Arc::new(world),
+            Arc::new(bvh_node),
             Arc::new(scene),
             |progress: Option<f64>| {
                 let mut std_out = stdout();

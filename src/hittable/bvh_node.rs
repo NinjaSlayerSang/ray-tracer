@@ -19,6 +19,8 @@ impl BVHNode {
 
     fn build(src_objects: &[&Arc<dyn Hittable + Send + Sync>], time_range: (f64, f64)) -> Self {
         let mut objects = Vec::from(src_objects);
+        let len = objects.len();
+
         let axis = thread_rng().gen_range(0u8..=2u8);
         objects.sort_by(|l, r| {
             use Ordering::{Equal, Greater, Less};
@@ -32,7 +34,6 @@ impl BVHNode {
                 (Some(lb), Some(rb)) => Aabb::compare(&lb, &rb, axis).unwrap(),
             }
         });
-        let len = objects.len();
 
         let mut left: Option<Arc<dyn Hittable + Send + Sync>> = None;
         let mut right: Option<Arc<dyn Hittable + Send + Sync>> = None;
@@ -47,7 +48,7 @@ impl BVHNode {
                 right = Some(objects[1].clone());
             }
             _ => {
-                let mid = len / 2;
+                let mid = (len + 1) / 2;
                 left = Some(Arc::new(Self::build(&objects[0..mid], time_range)));
                 right = Some(Arc::new(Self::build(&objects[mid..len], time_range)));
             }
@@ -76,19 +77,15 @@ impl BVHNode {
 
 impl Hittable for BVHNode {
     fn hit(&self, ray: &Ray, t_range: (f64, f64), rec: &mut HitRecord) -> bool {
-        if self.bounding_box.hit(ray, t_range) {
-            (if let Some(l) = &self.left {
-                l.hit(ray, t_range, rec)
-            } else {
-                false
-            }) || (if let Some(r) = &self.right {
-                r.hit(ray, t_range, rec)
-            } else {
-                false
-            })
-        } else {
-            false
-        }
+        self.bounding_box.hit(ray, t_range)
+            && (self
+                .left
+                .as_ref()
+                .map_or(false, |opt| opt.hit(ray, t_range, rec))
+                | self
+                    .right
+                    .as_ref()
+                    .map_or(false, |opt| opt.hit(ray, t_range, rec)))
     }
 
     fn bounding_box(&self, _: (f64, f64), output_box: &mut Aabb) -> bool {

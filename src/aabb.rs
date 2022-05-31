@@ -48,7 +48,7 @@ impl Aabb {
                 }
                 t_min = t_min.max(ta);
                 t_max = t_max.min(tb);
-                if t_max <= t_min {
+                if t_max < t_min {
                     return false;
                 }
             }
