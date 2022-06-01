@@ -80,7 +80,7 @@ impl PPMRender {
             let handle = spawn(move || {
                 writeln!(out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
-                let mut offset = 0usize;
+                let mut offset = 0;
                 let mut cache = Vec::<(usize, Color)>::with_capacity(2 * concurrent);
 
                 for result in result_receiver {

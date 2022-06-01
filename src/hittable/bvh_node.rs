@@ -21,7 +21,7 @@ impl BVHNode {
         let mut objects = Vec::from(src_objects);
         let len = objects.len();
 
-        let axis = thread_rng().gen_range(0u8..=2u8);
+        let axis = thread_rng().gen_range(0..=2);
         objects.sort_by(|l, r| {
             use Ordering::{Equal, Greater, Less};
             match (

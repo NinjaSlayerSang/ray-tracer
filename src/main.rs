@@ -9,6 +9,7 @@ mod render;
 mod sampler;
 mod scene;
 mod semaphore;
+mod texture;
 mod utils;
 mod vec3;
 
@@ -31,10 +32,23 @@ use scene::Sky;
 use utils::LinearGradientColor;
 use vec3::Vec3;
 
-fn demo_random_world() -> HittableList {
-    let mut world = HittableList::default();
+fn main() {
+    // Const
 
-    world.add(Arc::new(Sphere::new(
+    let image_size = (1280, 720);
+    let (image_width, image_height) = image_size;
+    let aspect_ratio = (image_width as f64) / (image_height as f64);
+    #[allow(unused_variables)]
+    let random_sampler = RandomSampler(100);
+    #[allow(unused_variables)]
+    let grid_sampler = GridSampler(10);
+    let time_range = (0.0, 1.0);
+
+    // World & Scene
+
+    let mut hittable_list = HittableList::default();
+
+    hittable_list.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
         Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))),
@@ -52,7 +66,7 @@ fn demo_random_world() -> HittableList {
                 let choose_mat = thread_rng().gen::<f64>();
                 if choose_mat < 0.15 {
                     // moving
-                    world.add(Arc::new(MovingSphere::new(
+                    hittable_list.add(Arc::new(MovingSphere::new(
                         (
                             center,
                             center + Vec3::new(0, thread_rng().gen_range(0.0..=0.5), 0),
@@ -63,14 +77,14 @@ fn demo_random_world() -> HittableList {
                     )))
                 } else if choose_mat < 0.4 {
                     // diffuse
-                    world.add(Arc::new(Sphere::new(
+                    hittable_list.add(Arc::new(Sphere::new(
                         center,
                         0.2,
                         Arc::new(Lambertian::new(Color::random() * Color::random())),
                     )));
                 } else if choose_mat < 0.85 {
                     // metal
-                    world.add(Arc::new(Sphere::new(
+                    hittable_list.add(Arc::new(Sphere::new(
                         center,
                         0.2,
                         Arc::new(Metal::new(
@@ -80,7 +94,7 @@ fn demo_random_world() -> HittableList {
                     )));
                 } else {
                     // glass
-                    world.add(Arc::new(Sphere::new(
+                    hittable_list.add(Arc::new(Sphere::new(
                         center,
                         0.2,
                         Arc::new(Dielectric::new(1.5)),
@@ -90,52 +104,33 @@ fn demo_random_world() -> HittableList {
         }
     }
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         Point3::new(0, 1, 0),
         1.0,
         Arc::new(Dielectric::new(1.5)),
     )));
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         Point3::new(-4, 1, 0),
         1.0,
         Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))),
     )));
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         Point3::new(4, 1, 0),
         1.0,
         Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
     )));
 
-    world
-}
-
-fn main() {
-    // Const
-
-    let image_size = (1920, 1080); // 1080p
-    let (image_width, image_height) = image_size;
-    let aspect_ratio = (image_width as f64) / (image_height as f64);
-    #[allow(unused_variables)]
-    let random_sampler = RandomSampler(100);
-    #[allow(unused_variables)]
-    let grid_sampler = GridSampler(10);
-    let time_range = (0.0, 1.0);
-
-    // World & Scene
-
-    let mut world = demo_random_world();
-
     let sun_position = Vec3::new(-300, 1500, 300);
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         sun_position,
         300.0,
         Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
     )));
 
-    let bvh_node = BVHNode::from_list(&world.objects, time_range);
+    let bvh_node = BVHNode::from_list(&hittable_list.objects, time_range);
 
     let scene = Sky::new(
         sun_position,
@@ -163,7 +158,7 @@ fn main() {
 
     // Render
 
-    let out_file_path = &args().collect::<Vec<String>>()[1];
+    let out_file_path = &args().collect::<Vec<_>>()[1];
     let out_file = File::create(out_file_path).unwrap();
 
     PPMRender::default()
