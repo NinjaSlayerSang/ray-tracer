@@ -1,8 +1,11 @@
-use std::sync::Arc;
+use std::{
+    f64::consts::{PI, TAU},
+    sync::Arc,
+};
 
 use crate::{
     aabb::Aabb,
-    material::Material,
+    material::{Context, Material},
     point3::Point3,
     ray::Ray,
     utils::{solve_quadratic_equation, QuadraticEquationRealRoot},
@@ -24,6 +27,16 @@ impl Sphere {
             center,
             radius,
             material,
+        }
+    }
+
+    fn get_sphere_uv(n: Vec3) -> Context {
+        let theta = (-n.y()).acos();
+        let phi = (-n.z()).atan2(n.x()) + PI;
+
+        Context::UV {
+            u: phi / TAU,
+            v: theta / PI,
         }
     }
 }
@@ -50,6 +63,7 @@ impl Hittable for Sphere {
             rec.t = t;
             rec.normal = Point3::vector(center, ray.at(rec.t)) / radius; // unit vector
             rec.material = self.material.clone();
+            rec.ctx = Self::get_sphere_uv(rec.normal);
             true
         };
 

@@ -1,23 +1,25 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray, vec3::Vec3};
+use std::sync::Arc;
+
+use crate::{
+    color::Color,
+    hittable::HitRecord,
+    ray::Ray,
+    texture::{SolidColor, Texture},
+    vec3::Vec3,
+};
 
 use super::Material;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Lambertian {
-    albedo: Color,
-}
-
-impl Default for Lambertian {
-    fn default() -> Self {
-        Self {
-            albedo: Color::white(),
-        }
-    }
+    albedo: Arc<dyn Texture + Send + Sync>,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub fn new(color: Color) -> Self {
+        Self {
+            albedo: Arc::new(SolidColor::new(color)),
+        }
     }
 }
 
@@ -37,7 +39,7 @@ impl Material for Lambertian {
                 scatter_direction = rec.normal
             }
 
-            *attenuation = self.albedo;
+            *attenuation = self.albedo.value(rec.ctx);
             *scattered = Ray {
                 origin: ray_in.at(rec.t),
                 direction: scatter_direction,

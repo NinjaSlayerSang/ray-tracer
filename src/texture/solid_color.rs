@@ -1,7 +1,8 @@
-use crate::{color::Color, point3::Point3};
+use crate::{color::Color, material::Context};
 
 use super::Texture;
 
+#[derive(Clone, Copy)]
 pub struct SolidColor(Color);
 
 impl SolidColor {
@@ -11,7 +12,7 @@ impl SolidColor {
 }
 
 impl Texture for SolidColor {
-    fn value(&self, _: f64, _: f64, _: Point3) -> Color {
+    fn value(&self, _: Context) -> Color {
         self.0
     }
 }
