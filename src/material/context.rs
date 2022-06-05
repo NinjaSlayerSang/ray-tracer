@@ -1,7 +1,7 @@
 #[derive(Clone, Copy)]
 pub enum Context {
-    None,
     UV { u: f64, v: f64 },
+    None,
 }
 
 impl Default for Context {

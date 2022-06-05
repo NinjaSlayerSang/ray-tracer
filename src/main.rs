@@ -13,6 +13,7 @@ mod texture;
 mod utils;
 mod vec3;
 
+use rand::{thread_rng, Rng};
 use std::{
     env::args,
     fs::File,
@@ -25,10 +26,10 @@ use color::Color;
 use hittable::{BVHNode, HittableList, MovingSphere, Sphere};
 use material::{Dielectric, Lambertian, LightSource, Metal};
 use point3::Point3;
-use rand::{thread_rng, Rng};
 use render::PPMRender;
 use sampler::{GridSampler, RandomSampler};
 use scene::Sky;
+use texture::SolidColor;
 use utils::LinearGradientColor;
 use vec3::Vec3;
 
@@ -51,7 +52,9 @@ fn main() {
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
-        Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))),
+        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
+            0.5, 0.5, 0.5,
+        ))))),
     )));
 
     let anchor = Point3::new(4, 0.2, 0);
@@ -73,14 +76,18 @@ fn main() {
                         ),
                         (0.0, 1.0),
                         0.2,
-                        Arc::new(Lambertian::new(Color::random() * Color::random())),
+                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(
+                            Color::random() * Color::random(),
+                        )))),
                     )))
                 } else if choose_mat < 0.4 {
                     // diffuse
                     hittable_list.add(Arc::new(Sphere::new(
                         center,
                         0.2,
-                        Arc::new(Lambertian::new(Color::random() * Color::random())),
+                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(
+                            Color::random() * Color::random(),
+                        )))),
                     )));
                 } else if choose_mat < 0.85 {
                     // metal
@@ -113,7 +120,9 @@ fn main() {
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(-4, 1, 0),
         1.0,
-        Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))),
+        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
+            0.4, 0.2, 0.1,
+        ))))),
     )));
 
     hittable_list.add(Arc::new(Sphere::new(
