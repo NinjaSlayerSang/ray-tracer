@@ -19,6 +19,7 @@ pub struct Sphere {
     center: Point3,
     radius: f64,
     material: Arc<dyn Material + Send + Sync>,
+    axis: (Vec3, Vec3),
 }
 
 impl Sphere {
@@ -27,12 +28,27 @@ impl Sphere {
             center,
             radius,
             material,
+            axis: (Vec3::new(0, 1, 0), Vec3::new(1, 0, 0)),
         }
     }
 
-    fn get_sphere_uv(n: Vec3) -> Context {
-        let theta = (-n.y()).acos();
-        let phi = (-n.z()).atan2(n.x()) + PI;
+    pub fn set_axis(mut self, axis: (Vec3, Vec3)) -> Self {
+        self.axis = axis;
+        self
+    }
+
+    fn get_coordinate(&self) -> (Vec3, Vec3, Vec3) {
+        let y = self.axis.0.unit();
+        let z = Vec3::cross(self.axis.1, y).unit();
+        let x = Vec3::cross(y, z);
+        (x, y, z)
+    }
+
+    fn get_sphere_uv(&self, n: Vec3) -> Context {
+        let (x, y, z) = self.get_coordinate();
+
+        let theta = (-Vec3::dot(n, y)).acos();
+        let phi = (-Vec3::dot(n, z)).atan2(Vec3::dot(n, x)) + PI;
 
         Context::UV {
             u: phi / TAU,
@@ -63,7 +79,7 @@ impl Hittable for Sphere {
             rec.t = t;
             rec.normal = Point3::vector(center, ray.at(rec.t)) / radius; // unit vector
             rec.material = self.material.clone();
-            rec.ctx = Self::get_sphere_uv(rec.normal);
+            rec.ctx = self.get_sphere_uv(rec.normal);
             true
         };
 

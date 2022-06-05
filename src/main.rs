@@ -29,7 +29,7 @@ use point3::Point3;
 use render::PPMRender;
 use sampler::{GridSampler, RandomSampler};
 use scene::Sky;
-use texture::SolidColor;
+use texture::{Checker, SolidColor};
 use utils::LinearGradientColor;
 use vec3::Vec3;
 
@@ -49,13 +49,21 @@ fn main() {
 
     let mut hittable_list = HittableList::default();
 
-    hittable_list.add(Arc::new(Sphere::new(
-        Point3::new(0, -1000, 0),
-        1000.0,
-        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
-            0.5, 0.5, 0.5,
-        ))))),
-    )));
+    #[allow(unused_variables)]
+    let solid_color_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
+        0.5, 0.5, 0.5,
+    )))));
+    #[allow(unused_variables)]
+    let checker_ground = Arc::new(Lambertian::new(Arc::new(Checker::new(
+        Arc::new(SolidColor::new(Color::white())),
+        Arc::new(SolidColor::new(Color::default())),
+        (4001f64, 2001f64),
+    ))));
+
+    hittable_list.add(Arc::new(
+        Sphere::new(Point3::new(0, -1000, 0), 1000.0, solid_color_ground)
+            .set_axis((Vec3::new(0, 0, -1), Vec3::new(0, 1, 0))),
+    ));
 
     let anchor = Point3::new(4, 0.2, 0);
     for a in -11..11 {
@@ -67,7 +75,7 @@ fn main() {
             );
             if (center - anchor).length() > 0.9 {
                 let choose_mat = thread_rng().gen::<f64>();
-                if choose_mat < 0.15 {
+                if choose_mat < 0.0 {
                     // moving
                     hittable_list.add(Arc::new(MovingSphere::new(
                         (
@@ -151,7 +159,7 @@ fn main() {
     let look_from = Point3::new(13, 2, 3);
     let look_at = Point3::new(0, 0, 0);
     let vup = Vec3::new(0, 1, 0);
-    let vfov = 20.0;
+    let vfov = 30.0;
     let aperture = 0.1;
     let focus_dist = 10.0;
 
