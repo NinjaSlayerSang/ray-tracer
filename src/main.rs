@@ -39,35 +39,25 @@ fn main() {
     let image_size = (1920, 1080);
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
-    #[allow(unused_variables)]
-    let random_sampler = RandomSampler(100);
-    #[allow(unused_variables)]
-    let grid_sampler = GridSampler(10);
+    let samplers = (GridSampler(10), RandomSampler(100));
     let time_range = (0.0, 1.0);
 
     // World & Scene
 
     let mut hittable_list = HittableList::default();
 
-    #[allow(unused_variables)]
-    let solid_color_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
-        0.5, 0.5, 0.5,
-    )))));
+    // ground
+    let ground_texture = Arc::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_material = Arc::new(Lambertian::new(ground_texture));
+    hittable_list.add(Arc::new(Sphere::new(
+        Point3::new(0, -1000, 0),
+        1000.0,
+        ground_material,
+    )));
 
-    let white_solid_color = Arc::new(SolidColor::new(Color::white()));
-    let black_solid_color = Arc::new(SolidColor::new(Color::default()));
-    let checker_texture = Arc::new(Checker::new(
-        white_solid_color,
-        black_solid_color,
-        (3000.0, 1500.0),
-    ));
-    let checker_ground = Arc::new(Lambertian::new(checker_texture));
+    let glass = Arc::new(Dielectric::new(1.5));
 
-    hittable_list.add(Arc::new(
-        Sphere::new(Point3::new(0, -1000, 0), 1000.0, checker_ground)
-            .set_axis((Vec3::new(0, 0, -1), Vec3::new(0, 1, 0))),
-    ));
-
+    // small ball
     let anchor = Point3::new(4, 0.2, 0);
     for a in -11..11 {
         for b in -11..11 {
@@ -76,6 +66,8 @@ fn main() {
                 0.2,
                 b as f64 + thread_rng().gen_range(0.0..=0.9),
             );
+            let random_color_texture = Arc::new(SolidColor::new(Color::random() * Color::random()));
+            let random_color_lambertian = Arc::new(Lambertian::new(random_color_texture));
             if (center - anchor).length() > 0.9 {
                 let choose_mat = thread_rng().gen::<f64>();
                 if choose_mat < 0.05 {
@@ -85,70 +77,58 @@ fn main() {
                             center,
                             center + Vec3::new(0, thread_rng().gen_range(0.0..=0.5), 0),
                         ),
-                        (0.0, 1.0),
+                        time_range,
                         0.2,
-                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(
-                            Color::random() * Color::random(),
-                        )))),
+                        random_color_lambertian,
                     )))
                 } else if choose_mat < 0.4 {
                     // diffuse
-                    hittable_list.add(Arc::new(Sphere::new(
-                        center,
-                        0.2,
-                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(
-                            Color::random() * Color::random(),
-                        )))),
-                    )));
+                    hittable_list.add(Arc::new(Sphere::new(center, 0.2, random_color_lambertian)));
                 } else if choose_mat < 0.85 {
                     // metal
-                    hittable_list.add(Arc::new(Sphere::new(
-                        center,
-                        0.2,
-                        Arc::new(Metal::new(
-                            Color::random_range(0.5..=1.0),
-                            thread_rng().gen_range(0.0..=0.5),
-                        )),
-                    )));
+                    let random_color_metal = Arc::new(Metal::new(
+                        Color::random_range(0.5..=1.0),
+                        thread_rng().gen_range(0.0..=0.5),
+                    ));
+                    hittable_list.add(Arc::new(Sphere::new(center, 0.2, random_color_metal)));
                 } else {
                     // glass
-                    hittable_list.add(Arc::new(Sphere::new(
-                        center,
-                        0.2,
-                        Arc::new(Dielectric::new(1.5)),
-                    )));
+                    hittable_list.add(Arc::new(Sphere::new(center, 0.2, glass.clone())));
                 }
             }
         }
     }
 
-    hittable_list.add(Arc::new(Sphere::new(
-        Point3::new(0, 1, 0),
-        1.0,
-        Arc::new(Dielectric::new(1.5)),
-    )));
+    // glass ball
+    hittable_list.add(Arc::new(Sphere::new(Point3::new(0, 1, 0), 1.0, glass)));
 
-    hittable_list.add(Arc::new(Sphere::new(
-        Point3::new(-4, 1, 0),
-        1.0,
-        Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
-            0.4, 0.2, 0.1,
-        ))))),
-    )));
+    // checker ball
+    let white_solid_color = Arc::new(SolidColor::new(Color::white()));
+    let black_solid_color = Arc::new(SolidColor::new(Color::default()));
+    let checker_texture = Arc::new(Checker::new(
+        white_solid_color,
+        black_solid_color,
+        (30.0, 15.0),
+    ));
+    let checker_lambertian = Arc::new(Lambertian::new(checker_texture));
+    hittable_list.add(Arc::new(
+        Sphere::new(Point3::new(-4, 1, 0), 1.0, checker_lambertian)
+            .set_axis((Vec3::new(1, 3, 1), Vec3::new(1, 0, 0))),
+    ));
 
+    // glossy ball
+    let mirrorlike_metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(4, 1, 0),
         1.0,
-        Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
+        mirrorlike_metal,
     )));
 
     let sun_position = Vec3::new(-300, 1500, 300);
 
-    hittable_list.add(Arc::new(Sphere::new(
-        sun_position,
-        300.0,
-        Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9))),
-    )));
+    // sun
+    let lightsource = Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9)));
+    hittable_list.add(Arc::new(Sphere::new(sun_position, 300.0, lightsource)));
 
     let bvh_node = BVHNode::from_list(&hittable_list.objects, time_range);
 
@@ -162,8 +142,8 @@ fn main() {
     let look_from = Point3::new(13, 2, 3);
     let look_at = Point3::new(0, 0, 0);
     let vup = Vec3::new(0, 1, 0);
-    let vfov = 30.0;
-    let aperture = 0.1;
+    let vfov = 25.0;
+    let aperture = 0.05;
     let focus_dist = 10.0;
 
     let camera = Camera::new(
@@ -185,7 +165,7 @@ fn main() {
         .draw(
             out_file,
             image_size,
-            grid_sampler,
+            samplers.0,
             Arc::new(camera),
             Arc::new(bvh_node),
             Arc::new(scene),
