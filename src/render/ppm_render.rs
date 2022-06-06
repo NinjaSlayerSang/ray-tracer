@@ -25,7 +25,7 @@ impl Default for PPMRender {
             dissipation: Default::default(),
             depth: 100,
             gamma: 2.2,
-            concurrent: 4,
+            concurrent: 8,
         }
     }
 }

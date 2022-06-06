@@ -36,7 +36,7 @@ use vec3::Vec3;
 fn main() {
     // Const
 
-    let image_size = (1280, 720);
+    let image_size = (1920, 1080);
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     #[allow(unused_variables)]
@@ -53,15 +53,18 @@ fn main() {
     let solid_color_ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(Color::new(
         0.5, 0.5, 0.5,
     )))));
-    #[allow(unused_variables)]
-    let checker_ground = Arc::new(Lambertian::new(Arc::new(Checker::new(
-        Arc::new(SolidColor::new(Color::white())),
-        Arc::new(SolidColor::new(Color::default())),
-        (4001f64, 2001f64),
-    ))));
+
+    let white_solid_color = Arc::new(SolidColor::new(Color::white()));
+    let black_solid_color = Arc::new(SolidColor::new(Color::default()));
+    let checker_texture = Arc::new(Checker::new(
+        white_solid_color,
+        black_solid_color,
+        (3000.0, 1500.0),
+    ));
+    let checker_ground = Arc::new(Lambertian::new(checker_texture));
 
     hittable_list.add(Arc::new(
-        Sphere::new(Point3::new(0, -1000, 0), 1000.0, solid_color_ground)
+        Sphere::new(Point3::new(0, -1000, 0), 1000.0, checker_ground)
             .set_axis((Vec3::new(0, 0, -1), Vec3::new(0, 1, 0))),
     ));
 
@@ -75,7 +78,7 @@ fn main() {
             );
             if (center - anchor).length() > 0.9 {
                 let choose_mat = thread_rng().gen::<f64>();
-                if choose_mat < 0.0 {
+                if choose_mat < 0.05 {
                     // moving
                     hittable_list.add(Arc::new(MovingSphere::new(
                         (

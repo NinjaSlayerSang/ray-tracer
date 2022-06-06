@@ -77,15 +77,24 @@ impl BVHNode {
 
 impl Hittable for BVHNode {
     fn hit(&self, ray: &Ray, t_range: (f64, f64), rec: &mut HitRecord) -> bool {
-        self.bounding_box.hit(ray, t_range)
-            && (self
+        self.bounding_box.check_hit(ray, t_range) && {
+            let hit_left = self
                 .left
                 .as_ref()
-                .map_or(false, |opt| opt.hit(ray, t_range, rec))
-                | self
-                    .right
-                    .as_ref()
-                    .map_or(false, |opt| opt.hit(ray, t_range, rec)))
+                .map_or(false, |opt| opt.hit(ray, t_range, rec));
+            let hit_right = self.right.as_ref().map_or(false, |opt| {
+                opt.hit(
+                    ray,
+                    if hit_left {
+                        (t_range.0, rec.t)
+                    } else {
+                        t_range
+                    },
+                    rec,
+                )
+            });
+            hit_left || hit_right
+        }
     }
 
     fn bounding_box(&self, _: (f64, f64), output_box: &mut Aabb) -> bool {
