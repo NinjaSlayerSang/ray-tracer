@@ -1,37 +1,23 @@
-mod aabb;
-mod camera;
-mod color;
-mod hittable;
-mod material;
-mod point3;
-mod ray;
-mod render;
-mod sampler;
-mod scene;
-mod semaphore;
-mod texture;
-mod utils;
-mod vec3;
-
 use rand::{thread_rng, Rng};
+use ray_tracer::{
+    camera::Camera,
+    color::Color,
+    hittable::{BVHNode, HittableList, MovingSphere, Sphere},
+    material::{Dielectric, Lambertian, LightSource, Metal},
+    point3::Point3,
+    render::PPMRender,
+    sampler::{GridSampler, RandomSampler},
+    scene::Sky,
+    texture::{Checker, SolidColor},
+    utils::LinearGradientColor,
+    vec3::Vec3,
+};
 use std::{
     env::args,
     fs::File,
     io::{stdout, Write},
     sync::Arc,
 };
-
-use camera::Camera;
-use color::Color;
-use hittable::{BVHNode, HittableList, MovingSphere, Sphere};
-use material::{Dielectric, Lambertian, LightSource, Metal};
-use point3::Point3;
-use render::PPMRender;
-use sampler::{GridSampler, RandomSampler};
-use scene::Sky;
-use texture::{Checker, SolidColor};
-use utils::LinearGradientColor;
-use vec3::Vec3;
 
 fn main() {
     // Const
