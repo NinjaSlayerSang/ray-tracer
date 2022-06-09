@@ -82,3 +82,63 @@ impl LinearGradientColor {
         (1f64 - t) * self.0 + t * self.1
     }
 }
+
+pub trait Permutable {
+    fn permute(&mut self);
+}
+
+impl<T> Permutable for [T] {
+    fn permute(&mut self) {
+        for i in (1..self.len()).rev() {
+            self.swap(i, thread_rng().gen_range(0..i))
+        }
+    }
+}
+
+const POINT_COUNT: usize = 256;
+
+#[derive(Clone)]
+pub struct Perlin {
+    ranfloat: Vec<f64>,
+    perm_x: Vec<usize>,
+    perm_y: Vec<usize>,
+    perm_z: Vec<usize>,
+}
+
+impl Perlin {
+    pub fn new() -> Self {
+        Self {
+            ranfloat: Vec::from({
+                let mut r = [f64::default(); POINT_COUNT];
+                for i in 0..POINT_COUNT {
+                    r[i] = thread_rng().gen();
+                }
+                r
+            }),
+            perm_x: Self::generate_perm(),
+            perm_y: Self::generate_perm(),
+            perm_z: Self::generate_perm(),
+        }
+    }
+
+    pub fn noise(&self, p: Vec3) -> f64 {
+        let l = POINT_COUNT - 1;
+        let i = ((4f64 * p.x()) as usize) & l;
+        let j = ((4f64 * p.y()) as usize) & l;
+        let k = ((4f64 * p.z()) as usize) & l;
+
+        self.ranfloat[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]]
+    }
+
+    fn generate_perm() -> Vec<usize> {
+        let mut p = [usize::default(); POINT_COUNT];
+
+        for i in 0..POINT_COUNT {
+            p[i] = i;
+        }
+
+        p.permute();
+
+        Vec::from(p)
+    }
+}
