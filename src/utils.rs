@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::{prelude::SliceRandom, thread_rng, Rng};
 use std::{cmp::Ordering, f64::consts::TAU};
 
 use crate::{color::Color, vec3::Vec3};
@@ -137,7 +137,13 @@ impl Perlin {
             p[i] = i;
         }
 
-        p.permute();
+        if true {
+            // use rand::seq::SliceRandom::shuffle
+            p.shuffle(&mut thread_rng());
+        } else {
+            // use custom Permutable::permute
+            p.permute();
+        }
 
         Vec::from(p)
     }

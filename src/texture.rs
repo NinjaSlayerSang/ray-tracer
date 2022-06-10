@@ -1,4 +1,5 @@
 mod checker;
+mod noise;
 mod solid_color;
 
 use crate::{color::Color, material::Context};
