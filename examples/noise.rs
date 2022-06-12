@@ -27,7 +27,7 @@ fn main() {
 
     let mut objects = HittableList::default();
 
-    let perlin = Arc::new(Perlin::default());
+    let perlin = Arc::new(Perlin::new(0.3));
     let pertext = Arc::new(Noise::new(perlin));
     objects.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),

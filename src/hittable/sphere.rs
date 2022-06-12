@@ -76,7 +76,7 @@ impl Hittable for Sphere {
         let solve = solve_quadratic_equation(a, hb, c);
 
         let mut update = |t: f64| -> bool {
-            let point = ray.at(rec.t);
+            let point = ray.at(t);
             rec.t = t;
             rec.normal = Point3::vector(center, point) / radius; // unit vector
             rec.material = self.material.clone();

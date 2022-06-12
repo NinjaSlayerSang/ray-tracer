@@ -103,10 +103,11 @@ pub struct Perlin {
     perm_x: Vec<usize>,
     perm_y: Vec<usize>,
     perm_z: Vec<usize>,
+    size: f64,
 }
 
-impl Default for Perlin {
-    fn default() -> Self {
+impl Perlin {
+    pub fn new(size: f64) -> Self {
         Self {
             ranfloat: Vec::from({
                 let mut r = [f64::default(); POINT_COUNT];
@@ -118,18 +119,20 @@ impl Default for Perlin {
             perm_x: Self::generate_perm(),
             perm_y: Self::generate_perm(),
             perm_z: Self::generate_perm(),
+            size,
         }
     }
-}
 
-impl Perlin {
     pub fn noise(&self, p: Vec3) -> f64 {
-        let l = POINT_COUNT - 1;
-        let i = ((4f64 * p.x()) as usize) & l;
-        let j = ((4f64 * p.y()) as usize) & l;
-        let k = ((4f64 * p.z()) as usize) & l;
+        let i = self.cast_by_size(p.x());
+        let j = self.cast_by_size(p.y());
+        let k = self.cast_by_size(p.z());
 
         self.ranfloat[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]]
+    }
+
+    fn cast_by_size(&self, p: f64) -> usize {
+        (((p / self.size).floor() as i64) & (POINT_COUNT as i64 - 1)) as usize
     }
 
     fn generate_perm() -> Vec<usize> {
