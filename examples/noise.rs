@@ -19,7 +19,7 @@ use std::{
 };
 
 fn main() {
-    let image_size = (1920, 1080);
+    let image_size = (640, 480);
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     let sampler = RandomSampler(100);
@@ -30,7 +30,7 @@ fn main() {
     let perlin = Arc::new(Perlin::default());
     let pertext = Arc::new(Noise::new(perlin));
     objects.add(Arc::new(Sphere::new(
-        Point3::new(0, -100, 0),
+        Point3::new(0, -1000, 0),
         1000.0,
         Arc::new(Lambertian::new(pertext.clone())),
     )));
@@ -50,7 +50,7 @@ fn main() {
     let look_at = Point3::new(0, 0, 0);
     let vup = Vec3::new(0, 1, 0);
     let vfov = 20.0;
-    let aperture = 0.05;
+    let aperture = 0.01;
     let focus_dist = 10.0;
 
     let camera = Camera::new(
