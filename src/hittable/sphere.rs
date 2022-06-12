@@ -43,15 +43,16 @@ impl Sphere {
         self
     }
 
-    fn get_sphere_uv(&self, n: Vec3) -> Context {
+    fn get_sphere_uvp(&self, n: Vec3, p: Point3) -> Context {
         let (x, y, z) = self.axis;
 
         let phi = (-Vec3::dot(n, z)).atan2(Vec3::dot(n, x)) + PI;
         let theta = (-Vec3::dot(n, y)).acos();
 
-        Context::UV {
+        Context::UVP {
             u: phi / TAU,
             v: theta / PI,
+            p,
         }
     }
 }
@@ -75,10 +76,11 @@ impl Hittable for Sphere {
         let solve = solve_quadratic_equation(a, hb, c);
 
         let mut update = |t: f64| -> bool {
+            let point = ray.at(rec.t);
             rec.t = t;
-            rec.normal = Point3::vector(center, ray.at(rec.t)) / radius; // unit vector
+            rec.normal = Point3::vector(center, point) / radius; // unit vector
             rec.material = self.material.clone();
-            rec.ctx = self.get_sphere_uv(rec.normal);
+            rec.ctx = self.get_sphere_uvp(rec.normal, point);
             true
         };
 

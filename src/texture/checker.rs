@@ -25,7 +25,7 @@ impl Texture for Checker {
     fn value(&self, ctx: Context) -> Color {
         let (tu, tv) = self.scales;
         match ctx {
-            Context::UV { u, v } => {
+            Context::UVP { u, v, .. } => {
                 if ((u * tu * PI).sin() * (v * tv * PI).sin()).is_sign_positive() {
                     self.odd.value(ctx)
                 } else {

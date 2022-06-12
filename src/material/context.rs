@@ -1,6 +1,8 @@
+use crate::point3::Point3;
+
 #[derive(Clone, Copy)]
 pub enum Context {
-    UV { u: f64, v: f64 },
+    UVP { u: f64, v: f64, p: Point3 },
     None,
 }
 
