@@ -105,8 +105,8 @@ pub struct Perlin {
     perm_z: Vec<usize>,
 }
 
-impl Perlin {
-    pub fn new() -> Self {
+impl Default for Perlin {
+    fn default() -> Self {
         Self {
             ranfloat: Vec::from({
                 let mut r = [f64::default(); POINT_COUNT];
@@ -120,7 +120,9 @@ impl Perlin {
             perm_z: Self::generate_perm(),
         }
     }
+}
 
+impl Perlin {
     pub fn noise(&self, p: Vec3) -> f64 {
         let l = POINT_COUNT - 1;
         let i = ((4f64 * p.x()) as usize) & l;
