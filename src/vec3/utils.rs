@@ -17,3 +17,9 @@ impl From<Vec3> for [f64; 3] {
         [v.0, v.1, v.2]
     }
 }
+
+impl From<Vec3> for (f64, f64, f64) {
+    fn from(v: Vec3) -> Self {
+        (v.0, v.1, v.2)
+    }
+}

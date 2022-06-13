@@ -83,19 +83,7 @@ impl LinearGradientColor {
     }
 }
 
-pub trait Permutable {
-    fn permute(&mut self);
-}
-
-impl<T> Permutable for [T] {
-    fn permute(&mut self) {
-        for i in (1..self.len()).rev() {
-            self.swap(i, thread_rng().gen_range(0..i))
-        }
-    }
-}
-
-const POINT_COUNT: usize = 256;
+const U8_SIZE: usize = 256;
 
 #[derive(Clone)]
 pub struct Perlin {
@@ -103,15 +91,14 @@ pub struct Perlin {
     perm_x: Vec<usize>,
     perm_y: Vec<usize>,
     perm_z: Vec<usize>,
-    size: f64,
 }
 
-impl Perlin {
-    pub fn new(size: f64) -> Self {
+impl Default for Perlin {
+    fn default() -> Self {
         Self {
             ranfloat: Vec::from({
-                let mut r = [f64::default(); POINT_COUNT];
-                for i in 0..POINT_COUNT {
+                let mut r = [f64::default(); U8_SIZE];
+                for i in 0..U8_SIZE {
                     r[i] = thread_rng().gen();
                 }
                 r
@@ -119,37 +106,72 @@ impl Perlin {
             perm_x: Self::generate_perm(),
             perm_y: Self::generate_perm(),
             perm_z: Self::generate_perm(),
-            size,
         }
     }
+}
 
+impl Perlin {
     pub fn noise(&self, p: Vec3) -> f64 {
-        let i = self.cast_by_size(p.x());
-        let j = self.cast_by_size(p.y());
-        let k = self.cast_by_size(p.z());
+        let (x, y, z) = p.into();
 
-        self.ranfloat[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]]
-    }
+        let i = x.floor() as i32;
+        let j = y.floor() as i32;
+        let k = z.floor() as i32;
 
-    fn cast_by_size(&self, p: f64) -> usize {
-        (((p / self.size).floor() as i64) & (POINT_COUNT as i64 - 1)) as usize
+        let u = Self::hermite_cubic(x - x.floor());
+        let v = Self::hermite_cubic(y - y.floor());
+        let w = Self::hermite_cubic(z - z.floor());
+
+        let mut c = [[[0f64; 2]; 2]; 2];
+
+        for di in 0..2 {
+            for dj in 0..2 {
+                for dk in 0..2 {
+                    c[di][dj][dk] = self.ranfloat[self.perm_x[Self::cast_index(i + di as i32)]
+                        ^ self.perm_y[Self::cast_index(j + dj as i32)]
+                        ^ self.perm_z[Self::cast_index(k + dk as i32)]];
+                }
+            }
+        }
+
+        Self::trilinear_interp(&c, u, v, w)
     }
 
     fn generate_perm() -> Vec<usize> {
-        let mut p = [usize::default(); POINT_COUNT];
+        let mut p = [0usize; U8_SIZE];
 
-        for i in 0..POINT_COUNT {
+        for i in 0..U8_SIZE {
             p[i] = i;
         }
 
-        if true {
-            // use rand::seq::SliceRandom::shuffle
-            p.shuffle(&mut thread_rng());
-        } else {
-            // use custom Permutable::permute
-            p.permute();
-        }
+        p.shuffle(&mut thread_rng());
 
         Vec::from(p)
+    }
+
+    fn hermite_cubic(x: f64) -> f64 {
+        x * x * (3f64 - 2f64 * x)
+    }
+
+    fn cast_index(i: i32) -> usize {
+        (i & 255) as usize
+    }
+
+    fn trilinear_interp(c: &[[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+        let mut accum = 0f64;
+
+        for i in 0..2 {
+            for j in 0..2 {
+                for k in 0..2 {
+                    let (fi, fj, fk) = (i as f64, j as f64, k as f64);
+                    accum += (fi * u + (1f64 - fi) * (1f64 - u))
+                        * (fj * v + (1f64 - fj) * (1f64 - v))
+                        * (fk * w + (1f64 - fk) * (1f64 - w))
+                        * c[i][j][k];
+                }
+            }
+        }
+
+        accum
     }
 }

@@ -8,7 +8,7 @@ use ray_tracer::{
     sampler::RandomSampler,
     scene::Sky,
     texture::Noise,
-    utils::{LinearGradientColor, Perlin},
+    utils::LinearGradientColor,
     vec3::Vec3,
 };
 use std::{
@@ -27,8 +27,7 @@ fn main() {
 
     let mut objects = HittableList::default();
 
-    let perlin = Arc::new(Perlin::new(0.3));
-    let pertext = Arc::new(Noise::new(perlin));
+    let pertext = Arc::new(Noise::new(4.0));
     objects.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
