@@ -49,4 +49,15 @@ impl Color {
             SCALE * self.z().clamp(min, max)
         )
     }
+
+    pub fn from_rgba(rgba: [u8; 4]) -> Self {
+        let [r, g, b, a] = rgba;
+
+        let fr = r as f64 / SCALE;
+        let fg = g as f64 / SCALE;
+        let fb = b as f64 / SCALE;
+        let fa = a as f64 / SCALE;
+
+        Self::new(fr * fa, fg * fa, fb * fa)
+    }
 }

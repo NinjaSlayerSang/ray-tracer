@@ -7,8 +7,8 @@ use ray_tracer::{
     render::PPMRender,
     sampler::RandomSampler,
     scene::Sky,
-    texture::Marble,
-    utils::LinearGradientColor,
+    texture::{ImageMap, Marble},
+    utils::{random_xy_in_circle, LinearGradientColor},
     vec3::Vec3,
 };
 use std::{
@@ -31,13 +31,20 @@ fn main() {
     objects.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
-        Arc::new(Lambertian::new(marble.clone())),
-    )));
-    objects.add(Arc::new(Sphere::new(
-        Point3::new(0, 2, 0),
-        2.0,
         Arc::new(Lambertian::new(marble)),
     )));
+    let image_map = Arc::new(ImageMap::try_new("./asset/earthmap.jpg").unwrap());
+    objects.add(Arc::new(
+        Sphere::new(
+            Point3::new(0, 2, 0),
+            2.0,
+            Arc::new(Lambertian::new(image_map)),
+        )
+        .set_axis({
+            let (x, y) = random_xy_in_circle(1.0);
+            (Vec3::new(1, 3, 1), Vec3::new(x, y, 0))
+        }),
+    ));
 
     let sun_position = Vec3::new(-300, 1500, 300);
     let scene = Sky::new(
