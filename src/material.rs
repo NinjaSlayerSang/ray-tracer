@@ -1,13 +1,13 @@
 mod context;
 mod dielectric;
+mod diffuse_light;
 mod lambertian;
-mod light_source;
 mod metal;
 
 use crate::{color::Color, hittable::HitRecord, ray::Ray};
 
 pub use {
-    context::Context, dielectric::Dielectric, lambertian::Lambertian, light_source::LightSource,
+    context::Context, dielectric::Dielectric, diffuse_light::DiffuseLight, lambertian::Lambertian,
     metal::Metal,
 };
 
@@ -15,17 +15,21 @@ pub use {
 pub struct Empty;
 
 pub trait Material {
+    #![allow(unused_variables)]
+
     fn scatter(
         &self,
         ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Color,
         scattered: &mut Ray,
-    ) -> bool;
-}
-
-impl Material for Empty {
-    fn scatter(&self, _: &Ray, _: &HitRecord, _: &mut Color, _: &mut Ray) -> bool {
+    ) -> bool {
         false
     }
+
+    fn emitted(&self, ctx: Context) -> Color {
+        Color::default()
+    }
 }
+
+impl Material for Empty {}

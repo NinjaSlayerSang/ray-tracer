@@ -3,7 +3,7 @@ use ray_tracer::{
     camera::Camera,
     color::Color,
     hittable::{BVHNode, HittableList, MovingSphere, Sphere},
-    material::{Dielectric, Lambertian, LightSource, Metal},
+    material::{Dielectric, DiffuseLight, Lambertian, Metal},
     point3::Point3,
     render::PPMRender,
     sampler::{GridSampler, RandomSampler},
@@ -113,7 +113,9 @@ fn main() {
     let sun_position = Vec3::new(-300, 1500, 300);
 
     // sun
-    let lightsource = Arc::new(LightSource::new(Color::new(0.9, 0.9, 0.9)));
+    let lightsource = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(Color::new(
+        0.9, 0.9, 0.9,
+    )))));
     hittable_list.add(Arc::new(Sphere::new(sun_position, 300.0, lightsource)));
 
     let bvh_node = BVHNode::from_list(&hittable_list.objects, time_range);

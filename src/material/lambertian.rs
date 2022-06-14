@@ -24,7 +24,7 @@ impl Material for Lambertian {
         scattered: &mut Ray,
     ) -> bool {
         let outward = Vec3::dot(ray_in.direction, rec.normal) <= 0f64;
-        if outward {
+        outward && {
             let mut scatter_direction = rec.normal + Vec3::random_unit();
 
             if scatter_direction == Vec3::default() {
@@ -38,9 +38,6 @@ impl Material for Lambertian {
                 time: ray_in.time,
             };
             true
-        } else {
-            *attenuation = Color::default();
-            false
         }
     }
 }

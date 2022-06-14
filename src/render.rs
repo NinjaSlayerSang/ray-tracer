@@ -23,17 +23,19 @@ fn ray_color(
     if depth > 0 {
         let mut rec = HitRecord::default();
         if hittable.hit(ray, t_range, &mut rec) {
+            let mut emitted = rec.material.emitted(rec.ctx);
+
             let mut scattered = Ray::default();
             let mut attenuation = Color::default();
             if rec
                 .material
                 .scatter(ray, &rec, &mut attenuation, &mut scattered)
             {
-                attenuation
+                emitted += attenuation
                     * ray_color(&scattered, hittable, scene, t_range, dissipation, depth - 1)
-            } else {
-                attenuation
             }
+
+            emitted
         } else {
             scene.scene_color(ray)
         }
