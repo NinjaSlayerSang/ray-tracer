@@ -7,7 +7,7 @@ use ray_tracer::{
     render::PPMRender,
     sampler::RandomSampler,
     scene::Sky,
-    texture::Noise,
+    texture::Marble,
     utils::LinearGradientColor,
     vec3::Vec3,
 };
@@ -19,7 +19,7 @@ use std::{
 };
 
 fn main() {
-    let image_size = (640, 480);
+    let image_size = (1280, 720);
     let (image_width, image_height) = image_size;
     let aspect_ratio = (image_width as f64) / (image_height as f64);
     let sampler = RandomSampler(100);
@@ -27,16 +27,16 @@ fn main() {
 
     let mut objects = HittableList::default();
 
-    let pertext = Arc::new(Noise::new(4.0));
+    let marble = Arc::new(Marble::new(Vec3::new(0, 0, 4)));
     objects.add(Arc::new(Sphere::new(
         Point3::new(0, -1000, 0),
         1000.0,
-        Arc::new(Lambertian::new(pertext.clone())),
+        Arc::new(Lambertian::new(marble.clone())),
     )));
     objects.add(Arc::new(Sphere::new(
         Point3::new(0, 2, 0),
         2.0,
-        Arc::new(Lambertian::new(pertext)),
+        Arc::new(Lambertian::new(marble)),
     )));
 
     let sun_position = Vec3::new(-300, 1500, 300);
@@ -45,8 +45,8 @@ fn main() {
         LinearGradientColor::new(Color::new(0.0, 0.1, 0.2), Color::new(0.5, 0.7, 1.0)),
     );
 
-    let look_from = Point3::new(13, 2, 3);
-    let look_at = Point3::new(0, 0, 0);
+    let look_from = Point3::new(18, 3, 5);
+    let look_at = Point3::new(0, 1, 0);
     let vup = Vec3::new(0, 1, 0);
     let vfov = 20.0;
     let aperture = 0.01;

@@ -18,6 +18,8 @@ Install **_Rust toolchain_** before running.
 ```shell
 # pinballs
 cargo run --example pinballs --release -- pinballs.ppm
+# marble texture
+cargo run --example marble --release -- marble.ppm
 # add "--release" unless you have enough patience to wait for much longer time...
 
 # test

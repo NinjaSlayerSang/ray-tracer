@@ -87,7 +87,7 @@ const U8_SIZE: usize = 256;
 
 #[derive(Clone)]
 pub struct Perlin {
-    ranfloat: Vec<f64>,
+    ranvec: Vec<Vec3>,
     perm_x: Vec<usize>,
     perm_y: Vec<usize>,
     perm_z: Vec<usize>,
@@ -96,13 +96,7 @@ pub struct Perlin {
 impl Default for Perlin {
     fn default() -> Self {
         Self {
-            ranfloat: Vec::from({
-                let mut r = [f64::default(); U8_SIZE];
-                for i in 0..U8_SIZE {
-                    r[i] = thread_rng().gen();
-                }
-                r
-            }),
+            ranvec: (0..U8_SIZE).map(|_| Vec3::random_unit()).collect(),
             perm_x: Self::generate_perm(),
             perm_y: Self::generate_perm(),
             perm_z: Self::generate_perm(),
@@ -118,16 +112,16 @@ impl Perlin {
         let j = y.floor() as i32;
         let k = z.floor() as i32;
 
-        let u = Self::hermite_cubic(x - x.floor());
-        let v = Self::hermite_cubic(y - y.floor());
-        let w = Self::hermite_cubic(z - z.floor());
+        let u = x - x.floor();
+        let v = y - y.floor();
+        let w = z - z.floor();
 
-        let mut c = [[[0f64; 2]; 2]; 2];
+        let mut c = [[[Vec3::default(); 2]; 2]; 2];
 
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di][dj][dk] = self.ranfloat[self.perm_x[Self::cast_index(i + di as i32)]
+                    c[di][dj][dk] = self.ranvec[self.perm_x[Self::cast_index(i + di as i32)]
                         ^ self.perm_y[Self::cast_index(j + dj as i32)]
                         ^ self.perm_z[Self::cast_index(k + dk as i32)]];
                 }
@@ -135,6 +129,20 @@ impl Perlin {
         }
 
         Self::trilinear_interp(&c, u, v, w)
+    }
+
+    pub fn turb(&self, p: Vec3, depth: i32) -> f64 {
+        let mut accum = 0.0;
+        let mut temp_p = p;
+        let mut weight = 1.0;
+
+        for _ in 0..depth {
+            accum += weight * self.noise(temp_p);
+            weight *= 0.5;
+            temp_p *= 2;
+        }
+
+        accum.abs()
     }
 
     fn generate_perm() -> Vec<usize> {
@@ -157,17 +165,21 @@ impl Perlin {
         (i & 255) as usize
     }
 
-    fn trilinear_interp(c: &[[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+    fn trilinear_interp(c: &[[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+        let uu = Self::hermite_cubic(u);
+        let vv = Self::hermite_cubic(v);
+        let ww = Self::hermite_cubic(w);
         let mut accum = 0f64;
 
         for i in 0..2 {
             for j in 0..2 {
                 for k in 0..2 {
                     let (fi, fj, fk) = (i as f64, j as f64, k as f64);
-                    accum += (fi * u + (1f64 - fi) * (1f64 - u))
-                        * (fj * v + (1f64 - fj) * (1f64 - v))
-                        * (fk * w + (1f64 - fk) * (1f64 - w))
-                        * c[i][j][k];
+                    let weight_v = Vec3::new(u - fi, v - fj, w - fk);
+                    accum += (fi * uu + (1f64 - fi) * (1f64 - uu))
+                        * (fj * vv + (1f64 - fj) * (1f64 - vv))
+                        * (fk * ww + (1f64 - fk) * (1f64 - ww))
+                        * Vec3::dot(c[i][j][k], weight_v);
                 }
             }
         }
