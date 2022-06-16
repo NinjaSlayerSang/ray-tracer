@@ -73,7 +73,7 @@ fn main() {
                 } else if choose_mat < 0.85 {
                     // metal
                     let random_color_metal = Arc::new(Metal::new(
-                        Color::random_range(0.5..=1.0),
+                        Arc::new(SolidColor::new(Color::random_range(0.5..=1.0))),
                         thread_rng().gen_range(0.0..=0.5),
                     ));
                     hittable_list.add(Arc::new(Sphere::new(center, 0.2, random_color_metal)));
@@ -103,7 +103,10 @@ fn main() {
     ));
 
     // glossy ball
-    let mirrorlike_metal = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let mirrorlike_metal = Arc::new(Metal::new(
+        Arc::new(SolidColor::new(Color::new(0.7, 0.6, 0.5))),
+        0.0,
+    ));
     hittable_list.add(Arc::new(Sphere::new(
         Point3::new(4, 1, 0),
         1.0,

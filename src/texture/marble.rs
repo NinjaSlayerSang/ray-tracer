@@ -29,8 +29,6 @@ impl Marble {
 }
 
 impl Marble {
-    #![allow(dead_code)]
-
     pub fn set_gradient(mut self, gradient: LinearGradientColor) -> Self {
         self.gradient = gradient;
         self

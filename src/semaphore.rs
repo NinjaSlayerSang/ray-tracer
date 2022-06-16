@@ -25,7 +25,6 @@ impl Semaphore {
         self.1.notify_one();
     }
 
-    #[allow(dead_code)]
     pub fn count(&self) -> isize {
         *(self.0.lock().unwrap())
     }

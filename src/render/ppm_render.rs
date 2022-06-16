@@ -31,8 +31,6 @@ impl Default for PPMRender {
 }
 
 impl PPMRender {
-    #![allow(dead_code)]
-
     pub fn set_t_range(mut self, t_range: (f64, f64)) -> Self {
         self.t_range = t_range;
         self
@@ -73,80 +71,78 @@ impl PPMRender {
         let (image_width, image_height) = image_size;
         let capacity = (image_width * image_height) as f64;
 
-        let handle = {
-            let (result_sender, result_receiver) = channel::<(usize, Color)>();
+        let (result_sender, result_receiver) = channel::<(usize, Color)>();
 
-            let concurrent = self.concurrent;
-            let handle = spawn(move || {
-                writeln!(out, "P3\n{} {}\n255", image_width, image_height).unwrap();
+        let concurrent = self.concurrent;
+        let handle = spawn(move || {
+            writeln!(out, "P3\n{} {}\n255", image_width, image_height).unwrap();
 
-                let mut offset = 0;
-                let mut cache = Vec::<(usize, Color)>::with_capacity(2 * concurrent);
+            let mut offset = 0;
+            let mut cache = Vec::<(usize, Color)>::with_capacity(2 * concurrent);
 
-                for result in result_receiver {
-                    // enqueue
-                    let mut index = cache.len();
-                    for (i, item) in cache.iter().enumerate() {
-                        if item.0 > result.0 {
-                            index = i;
-                            break;
-                        }
+            for result in result_receiver {
+                // enqueue
+                let mut index = cache.len();
+                for (i, item) in cache.iter().enumerate() {
+                    if item.0 > result.0 {
+                        index = i;
+                        break;
                     }
-                    cache.insert(index, result);
+                }
+                cache.insert(index, result);
 
-                    // outqueue
-                    while !cache.is_empty() && cache[0].0 == offset {
-                        offset += 1;
-                        writeln!(out, "{}", cache.remove(0).1.into_rgb_str()).unwrap();
-                    }
-
-                    progress(Some(offset as f64 / capacity));
+                // outqueue
+                while !cache.is_empty() && cache[0].0 == offset {
+                    offset += 1;
+                    writeln!(out, "{}", cache.remove(0).1.into_rgb_str()).unwrap();
                 }
 
-                progress(None);
-            });
-
-            let semaphore = Arc::new(Semaphore::new(self.concurrent as isize));
-
-            let mut index = 0;
-            for j in (0..image_height).rev() {
-                for i in 0..image_width {
-                    semaphore.acquire();
-
-                    let t_range = self.t_range;
-                    let dissipation = self.dissipation;
-                    let depth = self.depth;
-                    let gamma = self.gamma;
-                    let shared_camera = camera.clone();
-                    let shared_hittable = hittable.clone();
-                    let shared_scene = scene.clone();
-                    let shared_result_sender = result_sender.clone();
-                    let shared_semaphore = semaphore.clone();
-                    spawn(move || {
-                        let color = render(
-                            (i, j),
-                            image_size,
-                            sampler,
-                            shared_camera,
-                            shared_hittable,
-                            shared_scene,
-                            t_range,
-                            dissipation,
-                            depth,
-                            gamma,
-                        );
-
-                        shared_result_sender.send((index, color)).unwrap();
-
-                        shared_semaphore.release();
-                    });
-
-                    index += 1;
-                }
+                progress(Some(offset as f64 / capacity));
             }
 
-            handle
-        };
+            progress(None);
+        });
+
+        let semaphore = Arc::new(Semaphore::new(self.concurrent as isize));
+
+        let mut index = 0;
+        for j in (0..image_height).rev() {
+            for i in 0..image_width {
+                semaphore.acquire();
+
+                let t_range = self.t_range;
+                let dissipation = self.dissipation;
+                let depth = self.depth;
+                let gamma = self.gamma;
+                let shared_camera = camera.clone();
+                let shared_hittable = hittable.clone();
+                let shared_scene = scene.clone();
+                let shared_result_sender = result_sender.clone();
+                let shared_semaphore = semaphore.clone();
+                spawn(move || {
+                    let color = render(
+                        (i, j),
+                        image_size,
+                        sampler,
+                        shared_camera,
+                        shared_hittable,
+                        shared_scene,
+                        t_range,
+                        dissipation,
+                        depth,
+                        gamma,
+                    );
+
+                    shared_result_sender.send((index, color)).unwrap();
+
+                    shared_semaphore.release();
+                });
+
+                index += 1;
+            }
+        }
+
+        drop(result_sender);
 
         handle.join()
     }
